@@ -483,13 +483,13 @@ module.exports = {
 
     try {
       var extract = require('extract-zip')
-      await extract(filePath, { dir: __dirname + "/tmp" })
+      await extract(filePath, { dir: process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp" })
     } catch(exception) {
-      callback({ "result": false, "message": "The provided file is either not a valid .synth or corrupt." })
+      callback({ "result": false, "message": "The provided file (" + filePath + ") is either not a valid .synth or corrupt. Error:\n" + JSON.stringify(exception)})
     }
 
     // C:\\Users\\user\\AppData\\Local" + "..."
-    var gameLocation = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs2\\"
+    var gameLocation = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
 
     // Switch to working directory of game not installed
     if (!fs.existsSync(gameLocation)) {
@@ -529,7 +529,7 @@ module.exports = {
 
     } catch (exception) {
 
-      callback({ "result": false, "message": exception })
+      callback({ "result": false, "message": JSON.stringify(exception) })
 
     } finally {
       // delete tmp-directory

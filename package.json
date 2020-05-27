@@ -1,0 +1,19 @@
+{
+  "name": "audiotrip-converter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "arraylist": "^0.1.0",
+    "extract-zip": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron": "^8.2.5"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sascha Knott",
+  "license": "GNU GPLv3"
+}

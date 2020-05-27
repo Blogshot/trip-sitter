@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Trip Sitter</title>
+  <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+
+  <style>
+    @font-face {
+      font-family: 'Neuropolitical';
+      font-style: normal;
+      font-weight: 400;
+      src: url('./neuropolitical.ttf') format('truetype');
+    }
+
+    :root {
+      --at-background-dark: #5b1c98;
+      --at-background-light: #6b2ca8;
+
+      --at-background-orange: #fe4c00;
+    }
+
+    body {
+      background-color: #222;
+      color: #111;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+
+      font-family: 'Neuropolitical', arial;
+      line-height: 1.5em;
+
+      overflow-x: hidden;
+      overflow-y: hidden;
+
+      text-align: center;
+      font-size: large;
+    }
+
+    #dropZone:hover {
+      background-color: var(--at-background-light);
+    }
+
+    #dropZone {
+      background-color: var(--at-background-dark);
+      height: 400px;
+      
+    }
+
+    #disclaimer {
+      background-color: var(--at-background-orange);
+      height: 350px;
+      line-height: normal;
+    }
+
+    .centeredList {
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    .centered {
+      display:flex;
+      justify-content:center;
+      line-height: 2em; 
+      align-items:center
+    }
+
+    #about {
+      color: #888
+    }
+
+    #about a {
+      color: #bbb
+    }
+
+  </style>
+
+  <script type='text/javascript'>
+
+    window.onload = function () {
+      var ipc = require('electron').ipcRenderer
+      var holder = document.getElementById('dropZone');
+
+
+      holder.ondragover = () => {
+        return false;
+      };
+
+      holder.ondragleave = () => {
+        return false;
+      };
+
+      holder.ondragend = () => {
+        return false;
+      };
+
+      holder.ondrop = (e) => {
+        e.preventDefault();
+
+        for (let f of e.dataTransfer.files) {
+          ipc.once('actionReply', function (event, response) {
+            alert(response)
+          })
+          ipc.send('onFile', f.path)
+        }
+
+        return false;
+      };
+    }
+
+  </script>
+</head>
+
+<body>
+
+
+
+  <!--<div style="height: 10%; text-align: center;">
+    <img style="height: 100%;" src="audiotrip-logo.png"></img>
+    
+  </div>-->
+
+  <div id="dropZone" class="centered">
+    <div>
+      
+      <h2>Drag a .synth file here</h2>
+      <img src="icons8-double-down-96.png"></img>
+      <p>This will automatically place the converted song into your game.</p>
+    </div>
+  </div>
+
+  <div id="disclaimer" class="centered">
+    <div>
+      <h2>Before using this tool, please consider the following</h2>
+      <p></p>
+
+
+      This piece of software is
+      <div class="centeredList">
+        <ul>
+          <li>a hobby project done in spare time. There <b>will be</b> waiting periods for bug fixes.</li>
+          <li>under active development and might contain bugs or conversion imperfections.</li>
+          <li>in no way not affilitated with <i>Kinemotik Studios</i> or their products.</li>
+        </ul>
+      </div>
+      This tool is purely intended to create custom songs as a starting point for mappers. You (the user) are expected
+      to not simply plagiarize the original authors work but to build your own choreographies on it.
+      </p>
+    </div>
+  </div>
+
+  <div id="about">
+    
+    <p><u>ABOUT</u><br/>
+    Icons by <a href=https://icons8.com/>icons8.com</a> | <a href=https://icons8.com/>GitHub</a></p>
+  </div>
+
+</body>
+
+</html>

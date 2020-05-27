@@ -1,6 +1,6 @@
 {
-  "name": "audiotrip-converter",
-  "version": "1.0.0",
+  "name": "trip-sitter",
+  "version": "0.1.0",
   "description": "",
   "main": "main.js",
   "dependencies": {
@@ -12,8 +12,14 @@
   },
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "electron-builder install-app-deps",
+    "build": "electron-builder --mac --windows --linux",
+    "release": "electron-builder --mac --windows --linux --publish always"
   },
   "author": "Sascha Knott",
-  "license": "GNU GPLv3"
+  "license": "GNU GPLv3",
+  "build": {
+		"appId": "trip-sitter",
+		"productName": "TripSitter"
+	}
 }

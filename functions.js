@@ -466,6 +466,12 @@ module.exports = {
 
           var currentGem = choreographies.list[elem].data.events[gem]
 
+          // remove convenience attributes
+          delete currentGem.bloggi
+          delete currentGem.gemType
+          delete currentGem.newline
+          delete currentGem.hand
+
           //logGem(currentGem, json.BPM)
         }
       }

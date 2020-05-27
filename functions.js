@@ -491,7 +491,7 @@ module.exports = {
     // C:\\Users\\user\\AppData\\Local" + "..."
     var gameLocation = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
 
-    // Switch to working directory of game not installed
+    // Switch to working directory if game not installed
     if (!fs.existsSync(gameLocation)) {
       gameLocation = ".\\output\\"
       
@@ -522,10 +522,10 @@ module.exports = {
 
       // write  audio file and generated song into custom song location
       fs.copyFileSync(".\\tmp\\" + file[0], gameLocation + file[0])
-      fs.writeFileSync(gameLocation + ats.metadata.title, JSON.stringify(ats, null, 2))
+      fs.writeFileSync(gameLocation + ats.metadata.title + ".ats", JSON.stringify(ats, null, 2))
 
 
-      callback({ "result": true, "message": "The song was successfully converted and imported." })
+      callback({ "result": true, "message": "The song was successfully converted and imported.\nYou can find the files at '" + gameLocation + "'" })
 
     } catch (exception) {
 

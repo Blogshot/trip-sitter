@@ -355,6 +355,8 @@ module.exports = {
 
     var json = JSON.parse(data.toString().trim())
 
+    var oldFormat = json.UsingBeatMeasure == undefined || !json.UsingBeatMeasure
+
     bpm = json.BPM
     
     var metadata = new Object()
@@ -452,7 +454,9 @@ module.exports = {
       for (var slideElement in Slides) {
         var currentSlide = Slides[slideElement]
 
-        var currentCrouch = Crouchs[crouchElement]
+        if (oldFormat) {
+          currentSlide = this.convertOldToNewFormat(currentSlide.time, currentSlide.slideType)
+        }
 
         var event = this.generateBarrier(currentSlide)
 
@@ -493,21 +497,53 @@ module.exports = {
     return skeleton
   },
 
+  convertOldToNewFormat: function convertMSToNewFormat(ms, slideType) {
+    var tmp = new Object
+
+    tmp.time = 0.0
+    tmp.position = [0.0, 0.0, this.calcZFromMS(ms)]
+    tmp.initialized = true
+    tmp.slideType = slideType == null ? 5 : slideType
+
+    return tmp
+  },
+
+  getDuration: async function (filePath) {
+
+
+  },
+
   startConversion: async function startConversion(filePath, callback) {
+
+    var tmpDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp\\"
+    var outputDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\"
 
     try {
       var extract = require('extract-zip')
-      await extract(filePath, { dir: process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp" })
-    } catch(exception) {
-      callback({ "result": false, "message": "The provided file (" + filePath + ") is either not a valid .synth or corrupt. Error:\n" + JSON.stringify(exception)})
+      // target directory is expected to be absolute
+      await extract(filePath, { dir: tmpDir })
+    } catch (exception) {
+      callback({ "result": false, "message": "The provided file (" + filePath + ") is either not a valid .synth or corrupt. Error:\n" + exception.message })
     }
-  
+
+    var audioFile = fs.readdirSync(tmpDir).filter(function (file) { return file.match(".*\.ogg") })[0]
+    var duration
+
+    var mm = require('music-metadata');
+
+    var metadata = await mm.parseFile(tmpDir + audioFile)
+    duration = Math.floor(metadata.format?.duration)
+
+    if (duration == undefined) {
+      callback({ "result": false, "message": "The provided audio file (" + tmpDir + audioFile + ") seems to be corrupt." })
+    }
+
     // C:\\Users\\user\\AppData\\Local" + "..."
     var gameLocation = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
 
     // Switch to working directory if game not installed
     if (!fs.existsSync(gameLocation)) {
-      gameLocation = ".\\output\\"
+      gameLocation = outputDir
 
       // create output folder of needed
       if (!fs.existsSync(gameLocation)) {
@@ -515,41 +551,28 @@ module.exports = {
       }
     }
 
-    if (!fs.existsSync(".\\tmp\\track.data.json") && fs.existsSync(".\\tmp\\beatmap.meta.bin")) {
-      callback({ "result": false, "message": "The custom song format is too old to be converted with the current version of this application. Please refer to GitHub." })
+    try {
+      var data = fs.readFileSync(tmpDir + "beatmap.meta.bin", { encoding: 'utf8' }).toString().trim()
+
+      // now, actually start the conversion
+      var ats = this.convertSynthridersFile(data, duration);
+
+      // write  audio file and generated song into custom song location
+      fs.copyFileSync(tmpDir + audioFile, gameLocation + audioFile)
+      fs.writeFileSync(gameLocation + ats.metadata.title + ".ats", JSON.stringify(ats, null, 2))
+
+
+      callback({ "result": true, "message": "The song was successfully converted and imported.\nYou can find the files at '" + gameLocation + "'" })
+
+    } catch (exception) {
+
+      callback({ "result": false, "message": exception.message })
+
+    } finally {
+      // delete tmp-directory
+      fs.rmdirSync(tmpDir, { recursive: true })
     }
 
-    try {
-// get the tracks duration
-var content = fs.readFileSync(".\\tmp\\track.data.json", { encoding: 'utf16le' }).toString().trim()
-var json = JSON.parse(content);
-var split = json.duration.split(":")
-var duration = parseInt(split[0]) * 60 + parseInt(split[1])
-
-var data = fs.readFileSync(".\\tmp\\beatmap.meta.bin", { encoding: 'utf8' }).toString().trim()
-
-// now, actually start the conversion
-var ats = this.convertSynthridersFile(data, duration);
-
-// get the audio file 
-var file = fs.readdirSync(".\\tmp").filter(function (file) { return file.match(".*\.ogg") })
-
-// write  audio file and generated song into custom song location
-fs.copyFileSync(".\\tmp\\" + file[0], gameLocation + file[0])
-fs.writeFileSync(gameLocation + ats.metadata.title + ".ats", JSON.stringify(ats, null, 2))
-
-
-callback({ "result": true, "message": "The song was successfully converted and imported.\nYou can find the files at '" + gameLocation + "'" })
-
-} catch (exception) {
-
-callback({ "result": false, "message": JSON.stringify(exception) })
-
-} finally {
-// delete tmp-directory
-fs.rmdirSync(".\\tmp", { recursive: true })
-}
-
-
-}
+    
+  }
 }

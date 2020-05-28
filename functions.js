@@ -105,7 +105,7 @@ module.exports = {
         break
       case 2:
         event.hand = "right diag"
-        event.position.z = +60
+        event.position.z = -60
         break;
       case 3:
         event.hand = "center"
@@ -113,7 +113,7 @@ module.exports = {
         break;
       case 4:
         event.hand = "left diag"
-        event.position.z = -60
+        event.position.z = +60
         // barrier center
         break
       case 5:

@@ -1,4 +1,5 @@
 const fs = require('fs')
+
 var offSetMS
 var bpm
 
@@ -164,17 +165,6 @@ module.exports = {
     event.beatDivision = 2
     event.broadcastEventID = 0
 
-    /*
-      Synthriders:
-      x =   -1   <-->   +1
-      y = -0.7   <-->   +0.7
-    
-      AudioTrip:
-      ATx = ((wingSpan-ashley) * xSynth)
-      ATy = ySynth+ashley
-  
-    */
-
     var heightAshley = 1.38
     var modifier = 0.5
 
@@ -236,7 +226,6 @@ module.exports = {
 
       var currentCheckpoint = checkPoints[checkpoint]
 
-
       // find the nearest checkpoint in SynthRiders' format
       var goal = this.calcZFromMS(currentCheckpoint) + start
 
@@ -279,7 +268,7 @@ module.exports = {
     var wingSpan = 1.2
     var armLength = 0.3
 
-    // Synthrider values. Minimums are inverted 
+    // Synthrider max positional values. Minimums are inverted 
     var maxX = 1.0
     var maxY = 0.7
 
@@ -296,7 +285,6 @@ module.exports = {
       "x": (x / maxX) * (wingSpan / 2),
       "y": (y / maxY) * armLength
     }
-
   },
 
   logGem: function logGem(currentGem) {
@@ -470,7 +458,6 @@ module.exports = {
 
       choreographies.list.push(choreography)
 
-
       for (var elem in choreographies.list) {
 
         for (var gem in choreographies.list[elem].data.events) {
@@ -505,11 +492,6 @@ module.exports = {
     tmp.slideType = slideType == null ? 5 : slideType
 
     return tmp
-  },
-
-  getDuration: async function (filePath) {
-
-
   },
 
   startConversion: async function startConversion(filePath, callback) {
@@ -571,7 +553,5 @@ module.exports = {
       // delete tmp-directory
       fs.rmdirSync(tmpDir, { recursive: true })
     }
-
-    
   }
 }

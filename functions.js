@@ -1,5 +1,5 @@
 const fs = require('fs')
-
+var offSetMS
 var bpm
 
 module.exports = {
@@ -25,10 +25,8 @@ module.exports = {
     // calculate the ms per beat
     var beat_interval = (60000 / bpm).toFixed(precision)
 
-    // calculate the beat of the input ms
-    var beat = Math.floor(ms / beat_interval)
-
-
+    // calculate the beat of the input ms (including offSet)
+    var beat = Math.floor((ms-offSetMS) / beat_interval)
 
     // now calculate the remainder to get the sub-beat
     var remainder = ms % beat_interval;
@@ -319,14 +317,14 @@ module.exports = {
 
     // clone base element
     var supportEvent = JSON.parse(JSON.stringify(event))
-    var offset = 0.15
+    var offsetX = 0.15
     var ribbon = event.gemType == "ribbon"
 
-    supportEvent.position.x -= offset
+    supportEvent.position.x -= offsetX
     supportEvent.type = ribbon ? 3 : 1
     supportEvent.hand = "left (split)"
 
-    event.position.x += offset
+    event.position.x += offsetX
     event.type = ribbon ? 4 : 2
     event.hand = "right (split)"
 
@@ -336,14 +334,14 @@ module.exports = {
 
         var currentSubPosition = event.subPositions[subPosition]
 
-        currentSubPosition.x -= offset
+        currentSubPosition.x -= offsetX
       }
 
       for (var subPosition in supportEvent.subPositions) {
 
         var currentSubPosition = supportEvent.subPositions[subPosition]
 
-        currentSubPosition.x += offset
+        currentSubPosition.x += offsetX
       }
     }
 
@@ -358,7 +356,8 @@ module.exports = {
     var oldFormat = json.UsingBeatMeasure == undefined || !json.UsingBeatMeasure
 
     bpm = json.BPM
-    
+    offSetMS = json.Offset
+
     var metadata = new Object()
     metadata.custom = true
     metadata.authorID = {}

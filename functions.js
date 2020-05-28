@@ -355,13 +355,13 @@ module.exports = {
 
     var json = JSON.parse(data.toString().trim())
 
-    bpm = json.BPM    
-
+    bpm = json.BPM
+    
     var metadata = new Object()
     metadata.custom = true
     metadata.authorID = {}
     metadata.songID = ""
-    metadata.koreography = { "m_FileID": 0, "m_PathID": 0 },
+    metadata.koreography = { "instanceID": 0 }
     metadata.sceneName = "Universal"
     metadata.title = json.Name
     metadata.artist = json.Author

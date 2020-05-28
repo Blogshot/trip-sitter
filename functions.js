@@ -1,5 +1,7 @@
 const fs = require('fs')
 
+var bpm
+
 module.exports = {
 
   reduce: function reduce(numerator, denominator) {
@@ -14,7 +16,7 @@ module.exports = {
     return [numerator / gcd, denominator / gcd];
   },
 
-  calcBeatFromMillis: function calcBeatFromMillis(ms, bpm) {
+  calcBeatFromMillis: function calcBeatFromMillis(ms) {
 
     // 3 decimal places -> microseconds. Very precise
     // 0 decimal places -> milliseconds. Precise enough
@@ -70,16 +72,16 @@ module.exports = {
     return (ms / 1000) * 20
   },
 
-  generateCrouch: function generateCrouch(currentElement, timestamp, bpm) {
+  generateCrouch: function generateCrouch(currentElement) {
 
     // modify element to have an additional "custom" slideType
     currentElement.slideType = 5
 
     // business as usual
-    return this.generateBarrier(currentElement, timestamp, bpm)
+    return this.generateBarrier(currentElement)
   },
 
-  generateBarrier: function generateBarrier(currentElement, timestamp, bpm) {
+  generateBarrier: function generateBarrier(currentElement) {
 
     var event = new Object()
 
@@ -127,14 +129,14 @@ module.exports = {
     event.beatDivision = 2
     event.broadcastEventID = 0
 
-    event.time = this.calcBeatFromMillis(this.calcMSFromZ(currentElement.position[2]), bpm)
+    event.time = this.calcBeatFromMillis(this.calcMSFromZ(currentElement.position[2]))
 
     event.gemType = "barrier"
 
     return event;
   },
 
-  generateEvent: function generateEvent(currentElement, timestamp, bpm) {
+  generateEvent: function generateEvent(currentElement) {
 
     var event = new Object()
 
@@ -183,7 +185,7 @@ module.exports = {
     event.position.x = convertedCoords.x
     event.position.y = convertedCoords.y + heightAshley - modifier
 
-    event.time = this.calcBeatFromMillis(this.calcMSFromZ(currentElement.Position[2]), bpm)
+    event.time = this.calcBeatFromMillis(this.calcMSFromZ(currentElement.Position[2]))
 
     event.position.z = 0
 
@@ -216,7 +218,7 @@ module.exports = {
     var length_ms = this.calcMSFromZ(length)
 
     // for short ribbons (< 1 beat) we may need additional positions, so we increase beatdivision
-    if(this.calcBeatFromMillis(length_ms, bpm).beat == 0) {
+    if (this.calcBeatFromMillis(length_ms).beat == 0) {
       event.beatDivision = 4
     }
 
@@ -299,9 +301,9 @@ module.exports = {
 
   },
 
-  logGem: function logGem(currentGem, bpm) {
+  logGem: function logGem(currentGem) {
     var ms = this.calcMSFromZ(currentGem.bloggi)
-    var tmp = this.calcBeatFromMillis(ms, bpm)
+    var tmp = this.calcBeatFromMillis(ms)
 
     console.log(
       currentGem.bloggi.toFixed(5) + "m " +
@@ -353,12 +355,14 @@ module.exports = {
 
     var json = JSON.parse(data.toString().trim())
 
+    bpm = json.BPM    
+
     var metadata = new Object()
     metadata.custom = true
     metadata.authorID = {}
     metadata.songID = ""
     metadata.koreography = { "m_FileID": 0, "m_PathID": 0 },
-      metadata.sceneName = "Universal"
+    metadata.sceneName = "Universal"
     metadata.title = json.Name
     metadata.artist = json.Author
     metadata.songFilename = json.AudioName
@@ -371,7 +375,7 @@ module.exports = {
     metadata.tempoSections.push({
       startTimeInSeconds: 0.0,
       beatsPerMeasure: 4,
-      beatsPerMinute: json.BPM,
+      beatsPerMinute: bpm,
       doesStartNewMeasure: true
     })
 
@@ -416,7 +420,7 @@ module.exports = {
 
           var currentElement = currentTimestamp[element]
 
-          var event = this.generateEvent(currentElement, trackElement, json.BPM)
+          var event = this.generateEvent(currentElement, trackElement)
 
           // if the element is a BothHandSpecial, just split it into two gems
           if (currentElement.Type == 3 || currentElement.Type == 2) {
@@ -434,7 +438,11 @@ module.exports = {
       for (var crouchElement in Crouchs) {
         var currentCrouch = Crouchs[crouchElement]
 
-        var event = this.generateCrouch(currentCrouch, crouchElement, json.BPM)
+        if (oldFormat) {
+          currentCrouch = this.convertOldToNewFormat(currentCrouch, null)
+        }
+
+        var event = this.generateCrouch(currentCrouch)
 
         event.newline = true
 
@@ -446,7 +454,7 @@ module.exports = {
 
         var currentCrouch = Crouchs[crouchElement]
 
-        var event = this.generateBarrier(currentSlide, slideElement, json.BPM)
+        var event = this.generateBarrier(currentSlide)
 
         event.newline = true
 
@@ -472,7 +480,7 @@ module.exports = {
           delete currentGem.newline
           delete currentGem.hand
 
-          //logGem(currentGem, json.BPM)
+          //logGem(currentGem)
         }
       }
     }
@@ -493,14 +501,14 @@ module.exports = {
     } catch(exception) {
       callback({ "result": false, "message": "The provided file (" + filePath + ") is either not a valid .synth or corrupt. Error:\n" + JSON.stringify(exception)})
     }
-
+  
     // C:\\Users\\user\\AppData\\Local" + "..."
     var gameLocation = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
 
     // Switch to working directory if game not installed
     if (!fs.existsSync(gameLocation)) {
       gameLocation = ".\\output\\"
-      
+
       // create output folder of needed
       if (!fs.existsSync(gameLocation)) {
         fs.mkdirSync(gameLocation)
@@ -512,36 +520,36 @@ module.exports = {
     }
 
     try {
-      // get the tracks duration
-      var content = fs.readFileSync(".\\tmp\\track.data.json", { encoding: 'utf16le' }).toString().trim()
-      var json = JSON.parse(content);
-      var split = json.duration.split(":")
-      var duration = parseInt(split[0]) * 60 + parseInt(split[1])
+// get the tracks duration
+var content = fs.readFileSync(".\\tmp\\track.data.json", { encoding: 'utf16le' }).toString().trim()
+var json = JSON.parse(content);
+var split = json.duration.split(":")
+var duration = parseInt(split[0]) * 60 + parseInt(split[1])
 
-      var data = fs.readFileSync(".\\tmp\\beatmap.meta.bin", { encoding: 'utf8' }).toString().trim()
+var data = fs.readFileSync(".\\tmp\\beatmap.meta.bin", { encoding: 'utf8' }).toString().trim()
 
-      // now, actually start the conversion
-      var ats = this.convertSynthridersFile(data, duration);
+// now, actually start the conversion
+var ats = this.convertSynthridersFile(data, duration);
 
-      // get the audio file 
-      var file = fs.readdirSync(".\\tmp").filter(function (file) { return file.match(".*\.ogg") })
+// get the audio file 
+var file = fs.readdirSync(".\\tmp").filter(function (file) { return file.match(".*\.ogg") })
 
-      // write  audio file and generated song into custom song location
-      fs.copyFileSync(".\\tmp\\" + file[0], gameLocation + file[0])
-      fs.writeFileSync(gameLocation + ats.metadata.title + ".ats", JSON.stringify(ats, null, 2))
-
-
-      callback({ "result": true, "message": "The song was successfully converted and imported.\nYou can find the files at '" + gameLocation + "'" })
-
-    } catch (exception) {
-
-      callback({ "result": false, "message": JSON.stringify(exception) })
-
-    } finally {
-      // delete tmp-directory
-      fs.rmdirSync(".\\tmp", { recursive: true })
-    }
+// write  audio file and generated song into custom song location
+fs.copyFileSync(".\\tmp\\" + file[0], gameLocation + file[0])
+fs.writeFileSync(gameLocation + ats.metadata.title + ".ats", JSON.stringify(ats, null, 2))
 
 
-  }
+callback({ "result": true, "message": "The song was successfully converted and imported.\nYou can find the files at '" + gameLocation + "'" })
+
+} catch (exception) {
+
+callback({ "result": false, "message": JSON.stringify(exception) })
+
+} finally {
+// delete tmp-directory
+fs.rmdirSync(".\\tmp", { recursive: true })
+}
+
+
+}
 }

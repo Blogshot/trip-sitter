@@ -14,7 +14,8 @@ Download the latest [release](https://github.com/Blogshot/trip-sitter/releases) 
 You can easily Drag'n'Drop a `.synth`-file into the app to make it available in AudioTrip.
 
 ## Limitations
-Currently the conversion from SynthRiders intio AudioTrip might be inaccurate regarding the position of gems.
+* Gems might be inaccurately placed or out of reach
+* Barrier placement might end combos when there is no time to evade them
 
 ## Screenshots
 ![defaultView](https://github.com/Blogshot/trip-sitter/blob/master/defaultView.png)

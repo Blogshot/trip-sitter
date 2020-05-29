@@ -1,6 +1,6 @@
-# trip-sitter
-A tool to convert and import SynthRiders custom format into AudioTrip
+![defaultView](https://github.com/Blogshot/trip-sitter/blob/master/defaultView.png)
 
+# TripSitter
 This tool aims to provide an easy to use way to import existing SynthRiders custom songs into AudioTrip.
 
 ## outlook
@@ -16,6 +16,3 @@ You can easily Drag'n'Drop a `.synth`-file into the app to make it available in 
 ## Limitations
 * Gems might be inaccurately placed or out of reach
 * Barrier placement might end combos when there is no time to evade them
-
-## Screenshots
-![defaultView](https://github.com/Blogshot/trip-sitter/blob/master/defaultView.png)

@@ -14,7 +14,7 @@ Download the latest [release](https://github.com/Blogshot/trip-sitter/releases) 
 You can easily Drag'n'Drop a `.synth`-file into the app to make it available in AudioTrip.
 
 ## Limitations
-There are two possible formats of `.synth`-Files, which use different mechanisms to represent the placements of events. This tool is currently able to import the *newer* of the two formats, which should support the majority of songs.
+Currently the conversion from SynthRiders intio AudioTrip might be inaccurate regarding the position of gems.
 
 ## Screenshots
 ![defaultView](https://github.com/Blogshot/trip-sitter/blob/master/defaultView.png)

@@ -295,11 +295,11 @@ module.exports = {
       g(y) = 0.8y + 1.2
     */
 
-    var resultX = (0.7*x).toFixed(2)
-    var resultY = (0.8*y + 1.2).toFixed(2)
+   var resultX = (0.7*x).toFixed(2)
+   var resultY = (0.8*y + 1.2).toFixed(2)
 
     //console.log("(" + (x>=0 ? " " : "") + x + " |" + (y>=0 ? " " : "") + y + ")\t->\t(" + (resultX>=0 ? " " : "") + resultX + "|" + (resultY>=0 ? " " : "") + resultY + ")")
-    
+
     return {
       "x": resultX,
       "y": resultY
@@ -408,11 +408,11 @@ module.exports = {
       choreography.header.spawnAheadTime = { "beat": 8, "numerator": 0, "denominator": 1 }
       choreography.header.metadata = ""
       choreography.header.descriptor = ""
-      choreography.header.gemSpeed = 20.0,
-        choreography.header.gemRadius = 1.0,
-        choreography.header.handRadius = 0.27000001072883608,
-        choreography.header.animClipPath = "",
-        choreography.header.buildVersion = ""
+      choreography.header.gemSpeed = 20.0
+      choreography.header.gemRadius = 1.0
+      choreography.header.handRadius = 0.27000001072883608
+      choreography.header.animClipPath = ""
+      choreography.header.buildVersion = ""
 
       choreography.data = new Object()
 

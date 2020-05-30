@@ -165,13 +165,10 @@ module.exports = {
     event.beatDivision = 2
     event.broadcastEventID = 0
 
-    var heightAshley = 1.38
-    var modifier = 0.5
-
-    var convertedCoords = this.convertXY(currentElement.Position[0], currentElement.Position[1])
+    var convertedCoords = this.convertXY(currentElement.Position[0].toFixed(2), currentElement.Position[1].toFixed(2))
 
     event.position.x = convertedCoords.x
-    event.position.y = convertedCoords.y + heightAshley - modifier
+    event.position.y = convertedCoords.y
 
     event.time = this.calcBeatFromMillis(this.calcMSFromZ(currentElement.Position[2]))
 
@@ -265,25 +262,47 @@ module.exports = {
       This function converts the coordinates of SynthRiders to AudioTrip
     */
 
-    var wingSpan = 1.2
-    var armLength = 0.3
 
-    // Synthrider max positional values. Minimums are inverted 
-    var maxX = 1.0
-    var maxY = 0.7
 
     /*
-        Maximum X-offSet for AT is half a wingSpan left or right. 
-        Maximum Y-offSet for AT is about an arm's length up or down.
-  
-        The point of relation is (0|1.38), where the arena is centered at x=0 and y=1.38 the reference height (Ashley Space)
-  
-        Mininum/Maximum for AT is therefore (-0.6|1.08) and (0.6|1.68)
+      (SR) The center of the arena is (0|0).
+      (AT) The center of the arena is (0|1.38), so we need to add Ashley's height to the Y for correct coordinates
+    
+      Synthrider min/max positional values
+      X: +- 1.0
+      Y: +- 0.7
+
+      AudioTrip min/max positional values. 
+      X: +- 1.5
+      Y: 0, 2.6
+
+      The X-Coordinate can roughly be translated via f(x) = 1.5x
+      f(-1) = 1.5 * -1 = -1.5
+      f( 0) = 1.5 *  0 =  0
+      f( 1) = 1.5 *  1 =  1.5
+
+      The Y-Coordinate can roughly  be translated via g(y) = 1.8y + 1.38
+      g(-0.7) = 1.8 * -0.7 + 1.38 = 0.12
+      g( 0  ) = 1.8 *  0   + 1.38 = 1.38
+      g( 0.7) = 1.8 *  0.7 + 1.38 = 2.64
+
+      Special thanks to https://www.desmos.com/calculator ;)
+
+      It turns out that the formulars are correct, but to achieve comfortable spacing, they needed some tweaking.
+
+      The following are the final formulars that seem good:
+      f(x) = 0.7x
+      g(y) = 0.8y + 1.2
     */
 
+    var resultX = (0.7*x).toFixed(2)
+    var resultY = (0.8*y + 1.2).toFixed(2)
+
+    //console.log("(" + (x>=0 ? " " : "") + x + " |" + (y>=0 ? " " : "") + y + ")\t->\t(" + (resultX>=0 ? " " : "") + resultX + "|" + (resultY>=0 ? " " : "") + resultY + ")")
+    
     return {
-      "x": (x / maxX) * (wingSpan / 2),
-      "y": (y / maxY) * armLength
+      "x": resultX,
+      "y": resultY
     }
   },
 

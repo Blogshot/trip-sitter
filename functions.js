@@ -100,13 +100,13 @@ module.exports = {
       case 1:
         event.hand = "left"
         event.position.z = +90
-        // barrier left side
+        // barrier left side        
         break
       case 2:
         event.hand = "right diag"
         event.position.z = -60
         break;
-      case 3:
+      case 3: 
         event.hand = "center"
         // barrier center
         break;
@@ -246,8 +246,10 @@ module.exports = {
       }
 
       var subPosition = new Object()
-      subPosition.x = closest[0]
-      subPosition.y = closest[1]
+
+      var XY = this.convertXY(closest[0], closest[1], true)
+      subPosition.x = XY.x*2/3
+      subPosition.y = XY.y*2/3
       subPosition.z = "unused"
 
       event.subPositions.push(subPosition)
@@ -256,7 +258,7 @@ module.exports = {
     return event;
   },
 
-  convertXY: function convertXY(x, y) {
+  convertXY: function convertXY(x, y, OnlyOffset = false) {
 
     /*
       This function converts the coordinates of SynthRiders to AudioTrip
@@ -288,7 +290,9 @@ module.exports = {
 
       Special thanks to https://www.desmos.com/calculator ;)
 
-      It turns out that the formulars are correct, but to achieve comfortable spacing, they needed some tweaking.
+      It turns out that the formulars are correct, but to achieve comfortable spacing, they needed some tweaking. 
+      - The variable (x,y) changes the spacing between gems
+      - for g(y), the last part tweaks the Y-coordinates point of reference
 
       The following are the final formulars that seem good:
       f(x) = 0.7x
@@ -296,7 +300,7 @@ module.exports = {
     */
 
    var resultX = (0.7*x).toFixed(2)
-   var resultY = (0.8*y + 1.2).toFixed(2)
+   var resultY = (0.6*y + (OnlyOffset ? 0.0 : 1.2)).toFixed(2)
 
     //console.log("(" + (x>=0 ? " " : "") + x + " |" + (y>=0 ? " " : "") + y + ")\t->\t(" + (resultX>=0 ? " " : "") + resultX + "|" + (resultY>=0 ? " " : "") + resultY + ")")
 

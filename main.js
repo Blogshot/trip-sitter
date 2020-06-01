@@ -22,7 +22,7 @@ var ipc = require('electron').ipcMain;
 ipc.on('onFile', function(event, data){    
 
   converter.startConversion(data, function(successful) {
-    if(successful) {
+    if(successful.result) {
       event.sender.send('actionReply', successful.message);
     } else {
       event.sender.send('actionReply', "Error:\n" + successful.message);

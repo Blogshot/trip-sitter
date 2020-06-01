@@ -94,17 +94,20 @@ module.exports = {
     switch (currentElement.slideType) {
       case 0:
         event.hand = "right"
+        event.position.y = 0.3
         event.position.z = -90
         // barrier right side
         break
       case 1:
         event.hand = "left"
-        event.position.z = +90
+        event.position.z = 90
+        event.position.y = 0.3
         // barrier left side        
         break
       case 2:
         event.hand = "right diag"
-        event.position.z = -60
+        event.position.y = 0.3
+        event.position.z = -45
         break;
       case 3: 
         event.hand = "center"
@@ -112,8 +115,9 @@ module.exports = {
         break;
       case 4:
         event.hand = "left diag"
-        event.position.z = +60
-        // barrier center
+        event.position.z = 45
+        event.position.y = 0.3
+        // barrier left diagonal                
         break
       case 5:
         // only possible via generateCrouch()

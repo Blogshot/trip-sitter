@@ -109,7 +109,7 @@ module.exports = {
         event.position.y = 0.3
         event.position.z = -45
         break;
-      case 3: 
+      case 3:
         event.hand = "center"
         // barrier center
         break;
@@ -303,8 +303,8 @@ module.exports = {
       g(y) = 0.8y + 1.2
     */
 
-   var resultX = (0.7*x).toFixed(2)
-   var resultY = (0.6*y + (OnlyOffset ? 0.0 : 1.2)).toFixed(2)
+    var resultX = (0.7*x).toFixed(2)
+    var resultY = (0.6*y + (OnlyOffset ? 0.0 : 1.2)).toFixed(2)
 
     //console.log("(" + (x>=0 ? " " : "") + x + " |" + (y>=0 ? " " : "") + y + ")\t->\t(" + (resultX>=0 ? " " : "") + resultX + "|" + (resultY>=0 ? " " : "") + resultY + ")")
 
@@ -335,6 +335,7 @@ module.exports = {
     var offsetX = 0.15
     var ribbon = event.gemType == "ribbon"
 
+    // supportEvent will be left, the original event right
     supportEvent.position.x -= offsetX
     supportEvent.type = ribbon ? 3 : 1
     supportEvent.hand = "left (split)"
@@ -343,21 +344,19 @@ module.exports = {
     event.type = ribbon ? 4 : 2
     event.hand = "right (split)"
 
-    if (event.subPositions.length > 0) {
+    // supportEvent will be left, the original event right
+    for (var subPosition in event.subPositions) {
 
-      for (var subPosition in event.subPositions) {
+      var currentSubPosition = event.subPositions[subPosition]
 
-        var currentSubPosition = event.subPositions[subPosition]
+      currentSubPosition.x -= offsetX
+    }
 
-        currentSubPosition.x -= offsetX
-      }
+    for (var subPosition in supportEvent.subPositions) {
 
-      for (var subPosition in supportEvent.subPositions) {
+      var currentSubPosition = supportEvent.subPositions[subPosition]
 
-        var currentSubPosition = supportEvent.subPositions[subPosition]
-
-        currentSubPosition.x += offsetX
-      }
+      currentSubPosition.x += offsetX
     }
 
     return supportEvent
@@ -438,7 +437,7 @@ module.exports = {
 
           var event = this.generateEvent(currentElement, trackElement)
 
-          // if the element is a BothHandSpecial, just split it into two gems
+          // if the element is using both hands, just split it (and it's segments) into two gems
           if (currentElement.Type == 3 || currentElement.Type == 2) {
 
             var clone = this.splitGem(event)

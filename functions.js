@@ -106,7 +106,7 @@ module.exports = {
         break
       case 2:
         event.hand = "right diag"
-        event.position.y = 0.3
+        event.position.y = 0.2
         event.position.z = -45
         break;
       case 3:
@@ -116,7 +116,7 @@ module.exports = {
       case 4:
         event.hand = "left diag"
         event.position.z = 45
-        event.position.y = 0.3
+        event.position.y = 0.2
         // barrier left diagonal                
         break
       case 5:
@@ -349,14 +349,14 @@ module.exports = {
 
       var currentSubPosition = event.subPositions[subPosition]
 
-      currentSubPosition.x -= offsetX
+      currentSubPosition.x += offsetX
     }
 
     for (var subPosition in supportEvent.subPositions) {
 
       var currentSubPosition = supportEvent.subPositions[subPosition]
 
-      currentSubPosition.x += offsetX
+      currentSubPosition.x -= offsetX
     }
 
     return supportEvent

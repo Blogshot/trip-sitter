@@ -522,7 +522,8 @@ module.exports = {
 
   startConversion: async function startConversion(filePath, callback) {
 
-    var tmpDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp\\"
+    var fileName = filePath.substr(filePath.lastIndexOf("\\") + 1)
+    var tmpDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp_" + fileName.substr(0, fileName.length - ".synth".length) + "\\"
     var outputDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\"
 
     try {

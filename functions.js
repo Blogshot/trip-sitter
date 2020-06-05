@@ -384,7 +384,9 @@ module.exports = {
 
     var metadata = new Object()
     metadata.custom = true
-    metadata.authorID = {}
+    metadata.authorID = {
+      displayName: "Mapped by " + json.Beatmapper + " (converted from SynthRiders)"
+    }
     metadata.songID = ""
     metadata.koreography = { "instanceID": 0 }
     metadata.sceneName = "Universal"

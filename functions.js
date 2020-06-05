@@ -3,6 +3,16 @@ const fs = require('fs')
 var offSetMS
 var bpm
 
+// make available globally
+var locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
+var outputDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\"
+var tmpDir
+
+// check if PC version is installed
+var pc = fs.existsSync(locationPC)
+// check if Quest is connected
+var quest = false
+
 module.exports = {
 
   reduce: function reduce(numerator, denominator) {
@@ -523,8 +533,27 @@ module.exports = {
   startConversion: async function startConversion(filePath, callback) {
 
     var fileName = filePath.substr(filePath.lastIndexOf("\\") + 1)
-    var tmpDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp_" + fileName.substr(0, fileName.length - ".synth".length) + "\\"
-    var outputDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\"
+    
+    // check if Quest is connected
+    quest = await this.questIsConnected()
+
+    // support only dropping an .ogg file
+    if (fileName.endsWith(".ogg")) {
+
+      await this.deployToGame(filePath.substr(0, filePath.lastIndexOf("\\") + 1), fileName)
+
+      callback({
+        "result": true, "message": "The song was successfully imported.\nYou can find the files at:" +
+          "\n" + (pc ? "- " + locationPC : "") +
+          "\n" + (quest ? "- Your Quest" : "") +
+          "\n" + ((!pc && !quest) ? outputDir : "")
+      })
+
+      return
+    }
+
+    // if we reach here, the dropped file was no .ogg, so we need to extract it
+    tmpDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp_" + fileName.substr(0, fileName.length - ".synth".length) + "\\"
 
     try {
       var extract = require('extract-zip')
@@ -535,28 +564,14 @@ module.exports = {
     }
 
     var audioFile = fs.readdirSync(tmpDir).filter(function (file) { return file.match(".*\.ogg") })[0]
-    var duration
 
     var mm = require('music-metadata');
 
     var metadata = await mm.parseFile(tmpDir + audioFile)
-    duration = Math.floor(metadata.format?.duration)
+    var duration = Math.floor(metadata.format?.duration)
 
     if (duration == undefined) {
       callback({ "result": false, "message": "The provided audio file (" + tmpDir + audioFile + ") seems to be corrupt." })
-    }
-
-    // C:\\Users\\user\\AppData\\Local" + "..."
-    var gameLocation = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
-
-    // Switch to working directory if game not installed
-    if (!fs.existsSync(gameLocation)) {
-      gameLocation = outputDir
-
-      // create output folder of needed
-      if (!fs.existsSync(gameLocation)) {
-        fs.mkdirSync(gameLocation)
-      }
     }
 
     try {
@@ -565,12 +580,18 @@ module.exports = {
       // now, actually start the conversion
       var ats = this.convertSynthridersFile(data, duration);
 
-      // write  audio file and generated song into custom song location
-      fs.copyFileSync(tmpDir + audioFile, gameLocation + audioFile)
-      fs.writeFileSync(gameLocation + ats.metadata.title + ".ats", JSON.stringify(ats, null, 2))
+      // write ATS to tmpdir for further processing
+      fs.writeFileSync(tmpDir + ats.metadata.title + ".ats", JSON.stringify(ats, null, 2))
 
+      await this.deployToGame(tmpDir, audioFile)
+      await this.deployToGame(tmpDir, ats.metadata.title + ".ats")
 
-      callback({ "result": true, "message": "The song was successfully converted and imported.\nYou can find the files at '" + gameLocation + "'" })
+      callback({
+        "result": true, "message": "The song was successfully converted and imported.\nYou can find the files at:" +
+          "\n" + (pc ? "- " + locationPC : "") +
+          "\n" + (quest ? "- Your Quest" : "") +
+          "\n" + ((!pc && !quest) ? outputDir : "")
+      })
 
     } catch (exception) {
 
@@ -580,5 +601,91 @@ module.exports = {
       // delete tmp-directory
       fs.rmdirSync(tmpDir, { recursive: true })
     }
+  },
+
+  deployToGame: async function deployToGame(path, file) {
+
+    // write  audio file and generated song into custom song location
+    if (pc) {
+      fs.copyFileSync(path + file, locationPC + file)
+    }
+
+    if (quest) {
+      await this.copyToQuest(quest[0], quest[1], path + file)
+    }
+
+    if (!pc && !quest) {
+      // create output folder of needed
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir)
+      }
+
+      fs.copyFileSync(path + file, outputDir + file)
+      console.log("Written to local output directoy")
+    }
+  },
+
+  questIsConnected: async function questIsConnected() {
+    
+    return new Promise((resolve, reject) => {
+      var adb = require('adbkit')
+      var client = adb.createClient( { bin: ".\\adb.exe" })
+
+      client.listDevices().then(devices => {
+
+        if (devices.length == 0) {
+          console.log("No devices connected!")
+          resolve(false)
+        }
+
+        for (var index in devices) {
+
+          var id = devices[index].id
+
+          client.getProperties(id).then(props => {
+            var model = props["ro.product.model"]
+
+            if (model == "Quest") {
+              resolve([client, id])
+            }
+          })
+        }
+      })
+    })
+  },
+
+  copyToQuest: async function copyToQuest(client, id, filePath) {
+
+    return new Promise((resolve, reject) => {
+
+      client.getProperties(id).then(props => {
+
+        var model = props["ro.product.model"]
+
+        if (model == "Quest") {
+
+          client.syncService(id).then(sync => {
+
+            var transfer = this.transferFileADB(sync, filePath)
+
+            transfer.on('end', () => {
+              resolve(true)
+            })
+            transfer.on('error', error => {
+              console.error(error)
+              resolve(false)
+            })
+          })
+        }
+      })
+    })
+  },
+
+  transferFileADB: function transferFileADB(sync, filePath) {
+
+    var fileName = filePath.substr(filePath.lastIndexOf("\\") + 1)
+
+    return sync.pushFile(filePath, '/sdcard/Android/data/com.KinemotikStudios.AudioTripQuest/files/Songs/' + fileName)
   }
 }
+

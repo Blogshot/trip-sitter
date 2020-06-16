@@ -1,10 +1,13 @@
 const { app, BrowserWindow } = require('electron')
 
 const converter = require('./entrypoint.js')
+require('log-timestamp');
+
+var win
 
 function createWindow () {
   
-  let win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1200,
     height: 900,
     webPreferences: {
@@ -19,7 +22,7 @@ function createWindow () {
 
   setInterval(function () {
 
-    var questWrapper = require('./questWrapper')
+    var questWrapper = require('./utils/questWrapper')
 
     questWrapper.questIsConnected().then(data => {
       win.webContents.executeJavaScript(`document.getElementById('quest').style.backgroundColor = "green";`)
@@ -32,6 +35,8 @@ function createWindow () {
 
   // check if PC version is installed
   var locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
+
+  var fs = require('fs')
   var pc = fs.existsSync(locationPC)
 
   if (pc) {

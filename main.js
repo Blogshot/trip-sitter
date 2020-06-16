@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron')
 
-const converter = require('./functions.js')
+const converter = require('./entrypoint.js')
 
 function createWindow () {
   
@@ -13,21 +13,49 @@ function createWindow () {
   })
 
   win.setMenu(null)
-  
+  //win.webContents.openDevTools()
+
   win.loadFile('index.html')
+
+  setInterval(function () {
+
+    var questWrapper = require('./questWrapper')
+
+    questWrapper.questIsConnected().then(data => {
+      win.webContents.executeJavaScript(`document.getElementById('quest').style.backgroundColor = "green";`)
+    }).catch(error => {
+      console.log("Quest is not connected")
+      win.webContents.executeJavaScript(`document.getElementById('quest').style.backgroundColor = "red";`)
+    })
+
+  }, 2000)
+
+  // check if PC version is installed
+  var locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
+  var pc = fs.existsSync(locationPC)
+
+  if (pc) {
+    win.webContents.executeJavaScript(`document.getElementById('pc').style.backgroundColor = "green";`)
+  } else {
+    win.webContents.executeJavaScript(`document.getElementById('pc').style.backgroundColor = "red";`)
+  }
 }
 
 var ipc = require('electron').ipcMain;
 
 ipc.on('onFile', function(event, data){    
 
-  converter.startConversion(data, function(successful) {
-    if(successful.result) {
-      event.sender.send('actionReply', successful.message);
-    } else {
-      event.sender.send('actionReply', "Error:\n" + successful.message);
-    }
-  })
+  setLoading(true)
+
+  for (var elem in data) {
+    converter.startProcessing(data[elem], function(error) {
+
+      // callback is only for error messages
+      event.sender.send('actionReply', error);
+    })
+  }
+
+  setLoading(false)
 
 });
 
@@ -48,3 +76,14 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+function setLoading(bool) {
+
+  if (bool) {
+    win.webContents.executeJavaScript(`document.getElementById("dropLogo").style.display = "none";`)
+    win.webContents.executeJavaScript(`document.getElementById("spinner").style.removeProperty('display');`)
+  } else {
+    win.webContents.executeJavaScript(`document.getElementById("spinner").style.display = "none";`)
+    win.webContents.executeJavaScript(`document.getElementById("dropLogo").style.removeProperty('display');`)
+  }
+}

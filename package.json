@@ -1,6 +1,6 @@
 {
   "name": "trip-sitter",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "",
   "main": "main.js",
   "dependencies": {
@@ -24,9 +24,8 @@
   "build": {
     "appId": "trip-sitter",
     "extraFiles": [
-      "adb.exe",
-      "AdbWinApi.dll",
-      "AdbWinUsbApi.dll"
+      "copyViaMTP_AT.ps1",
+      "copyViaMTP_SR.ps1"
     ],
     "productName": "TripSitter"
   }

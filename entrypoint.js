@@ -52,6 +52,8 @@ module.exports = {
       })
 
 
+    } else {
+      callback("The file type of '" + fileName + "' not valid.")
     }
   }
 }

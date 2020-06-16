@@ -7,6 +7,7 @@
     "adbkit": "^2.11.1",
     "arraylist": "^0.1.0",
     "extract-zip": "^2.0.0",
+    "log-timestamp": "^0.3.0",
     "music-metadata": "^6.4.0"
   },
   "devDependencies": {

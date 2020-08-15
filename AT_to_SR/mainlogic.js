@@ -82,25 +82,29 @@ module.exports = {
 
   deployToGame: async function deployToGame(path) {
 
-    var locationPC = "STEAMDIR"
-
     var synth = fs.readdirSync(path).filter(function (file) { return file.match(".*\.synth") })[0]
 
     // write synth into custom song locations
 
     // check if PC version is installed
+    /*
+    var locationPC = "STEAMDIR"
+
     if (fs.existsSync(locationPC)) {
       fs.copyFileSync(path + synth, locationPC + synth)
     } else {
       fs.copyFileSync(path + synth, process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\" + synth)
     }
+    */
+    fs.copyFileSync(path + synth, process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\" + synth)
 
+    /*
     var questWrapper = require('./questWrapper')
 
     questWrapper.questIsConnected().then(data => {
       questWrapper.copyToQuest(path + synth, "SR")
     })
-
+    */
   }
 }
 

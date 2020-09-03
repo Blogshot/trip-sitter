@@ -2,7 +2,7 @@ const fs = require('fs')
 
 module.exports = {
 
-  convertAudioTripFile: function convertAudioTripFile(filePath, tmpDir) {
+  convertFile: function convertFile(filePath, tmpDir) {
 
     // extract audio metadata from tmpDir
     var audioFile = fs.readdirSync(tmpDir).filter(function (file) { return file.match(".*\.ogg") })[0]

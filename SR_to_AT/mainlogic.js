@@ -8,7 +8,7 @@ var bpm
 
 module.exports = {
 
-  convertSynthridersFile: function convertSynthridersFile(filePath, tmpDir) {
+  convertFile: function convertFile(filePath, tmpDir) {
 
     try {
       var extract = require('extract-zip')

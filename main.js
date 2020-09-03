@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require('electron')
 
-const converter = require('./entrypoint.js')
 require('log-timestamp');
 
 var win
@@ -8,18 +7,20 @@ var win
 function createWindow () {
   
   win = new BrowserWindow({
-    width: 1200,
-    height: 900,
+    width: 900,
+    height: 550,
     webPreferences: {
       nodeIntegration: true
     }
   })
 
   win.setMenu(null)
+  win.setResizable(false)
   //win.webContents.openDevTools()
 
   win.loadFile('index.html')
 
+  // Check if quest is connected every 2 seconds
   setInterval(function () {
 
     var questWrapper = require('./utils/questWrapper')
@@ -52,7 +53,11 @@ ipc.on('onFile', function(event, data){
 
   setLoading(true)
 
+  // date is an array of paths to the dropped files
   for (var elem in data) {
+
+    // start processing for each path
+    var converter = require('./entrypoint.js')
     converter.startProcessing(data[elem], function(error) {
 
       // callback is only for error messages
@@ -70,8 +75,6 @@ app.whenReady().then(createWindow)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     
-    // kill adb before exiting
-    require('adbkit').createClient( { bin: ".\\adb.exe" }).kill()
     app.quit()
   }
 })

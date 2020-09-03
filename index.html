@@ -9,28 +9,25 @@
 
   <style>
     @font-face {
-      font-family: 'Neuropolitical';
+      font-family: 'cuyabra';
       font-style: normal;
       font-weight: 400;
-      src: url('./assets/neuropolitical.ttf') format('truetype');
+      src: url('./assets/cuyabra.otf') format('truetype');
     }
 
     :root {
       --at-background-dark: #5b1c98;
-      --at-background-light: #6b2ca8;
-
       --at-background-orange: #fe4c00;
     }
 
     body {
-      background-color: #222;
       color: #111;
       position: absolute;
       width: 100%;
       height: 100%;
       margin: 0;
 
-      font-family: 'Neuropolitical', arial;
+      font-family: 'cuyabra', arial;
       line-height: 1.5em;
 
       overflow-x: hidden;
@@ -42,34 +39,41 @@
       user-select: none;
     }
 
-    #quest {
+    .status {
       position: absolute;
-      left: 90%;
+      left: 85%;
       top: 10%;
-      width: 5%;
+      width: 99px;
+      height: 40px;
       background-color: red;
-      border-radius: 15px;
+      border-radius: 15px; 
+      font-size: 25px;
+      line-height: 25px;
+    }
+
+    .status_content {
+      position:absolute; 
+      width: 50px; 
+      top: 5px; 
+      right: 25%
+    }
+
+    #quest {
+      top: 10%;
     }
 
     #pc {
-      position: absolute;
-      left: 90%;
       top: 20%;
-      width: 5%;
-      background-color: red;
-      border-radius: 15px;
-      font-size: medium;
     }
 
     #dropZone {
       background-color: var(--at-background-dark);
       height: 400px;
-      display: flow-root;
     }
 
     #disclaimer {
       background-color: var(--at-background-orange);
-      height: 350px;
+      height: 150px;
       line-height: normal;
     }
 
@@ -85,14 +89,6 @@
       justify-content:center;
       line-height: 2em; 
       align-items:center
-    }
-
-    #about {
-      color: #888
-    }
-
-    #about a {
-      color: #bbb
     }
 
     .lds-ripple {
@@ -165,6 +161,7 @@
         ipc.once('actionReply', function (event, response) {
           alert(response)
         })
+        
         ipc.send('onFile', array)
 
         return false;
@@ -176,49 +173,35 @@
 
 <body>
 
-  <div id="quest">
-    <img style="width: 100%; vertical-align: middle" src="./assets/quest.png">
-  </div>
-
-  <div id="pc">
-    PC
-  </div>
-
   <div id="dropZone" class="centered">
-    <h2>Drop .ats or .synth here</h2>
-      <img id="dropLogo" src="./assets/icons8-double-down-96.png"></img></br>
-      <div id="spinner" style="display: none;" class="centered lds-ripple">
-        <div></div>
-        <div></div>
+    <div id="quest" class="status">
+      <img class="status_content" src="./assets/quest.png">
+    </div>
+
+    <div id="pc" class="status">
+      <a class="status_content">PC</a>
+    </div>
+
+    <div style="text-shadow: 0 0 10px #6b2ca8;">
+      <h2>Drop .ats or .synth here</h2>
+        <img id="dropLogo" src="./assets/icons8-double-down-96.png"></img></br>
+        <div id="spinner" style="display: none;" class="centered lds-ripple">
+          <div></div>
+          <div></div>
+        </div>
+        <p>The files will be converted into their counterparts.</p>
       </div>
-      <p>This will automatically place it into your game.</p>
     </div>
   </div>
+  
 
   <div id="disclaimer" class="centered">
     <div>
-      <h2>Before using this tool, please consider the following</h2>
-
-      This piece of software is
-      <div class="centeredList">
-        <ul>
-          <li>a hobby project done in spare time. There <b>will be</b> waiting periods for bug fixes.</li>
-          <li>under active development and might contain bugs or conversion imperfections.</li>
-          <li>in no way not affilitated with any of the supported games.</li>
-        </ul>
-      </div>
-      This tool is purely intended to create custom songs as a starting point for mappers. You (the user) are expected
-      to not simply plagiarize the original authors work but to build your own choreographies on it.
-      </p>
+      Refer to <a href=https://github.com/Blogshot/trip-sitter/>GitHub</a> for any questions and How-Tos.
+    </br>
+      <p>Icons by <a href=https://icons8.com/>icons8.com</a></p>
     </div>
   </div>
-
-  <div id="about">
-    
-    <p><u>ABOUT</u><br/>
-    Icons by <a href=https://icons8.com/>icons8.com</a> | <a href=https://github.com/Blogshot/trip-sitter/>GitHub</a></p>
-  </div>
-
 </body>
 
 </html>

@@ -31,7 +31,7 @@ module.exports = {
     if (suffix == ".synth") {
 
       // result is ats json
-      fs.writeFileSync(tmpDir + ats.metadata.title + ".ats", JSON.stringify(result.data, null, 2))
+      fs.writeFileSync(tmpDir + result.metadata.title + ".ats", JSON.stringify(result.data, null, 2))
 
       // deploy ats and ogg
       converter.deployToGame(tmpDir)
@@ -42,9 +42,11 @@ module.exports = {
       fs.writeFileSync(tmpDir + "beatmap.meta.bin", JSON.stringify(result.data, null, 2))
 
       // pack files into .synth
-      converter.pack(tmpDir, ats.metadata.title + ".synth").then(synthPath => {
+      converter.pack(tmpDir, result.data.Name + ".synth").then(synthPath => {
+        
         // deploy synth
         converter.deployToGame(synthPath)
+
       }).catch(error => {
         errorCallback(error)
       })

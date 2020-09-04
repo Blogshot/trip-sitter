@@ -42,24 +42,36 @@
     .status {
       position: absolute;
       left: 85%;
-      top: 10%;
       width: 99px;
       height: 40px;
       background-color: red;
-      border-radius: 15px; 
+      border-radius: 15px;
       font-size: 25px;
       line-height: 25px;
     }
 
     .status_content {
-      position:absolute; 
-      width: 50px; 
-      top: 5px; 
+      position:absolute;
+      width: 50px;
+      top: 5px;
       right: 25%
     }
 
-    #quest {
+    #update {
       top: 10%;
+      visibility: hidden;
+    }
+
+    .updatelink {
+      width: 99px;
+      color: black;
+      text-decoration: none;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    #quest {
+      top: 15%;
     }
 
     #pc {
@@ -87,7 +99,7 @@
     .centered {
       display:flex;
       justify-content:center;
-      line-height: 2em; 
+      line-height: 2em;
       align-items:center
     }
 
@@ -127,7 +139,7 @@
         opacity: 0;
       }
     }
-
+    
   </style>
 
   <script type='text/javascript'>
@@ -161,7 +173,7 @@
         ipc.once('actionReply', function (event, response) {
           alert(response)
         })
-        
+
         ipc.send('onFile', array)
 
         return false;
@@ -174,6 +186,8 @@
 <body>
 
   <div id="dropZone" class="centered">
+    <a id="update" class="status updatelink" target="_blank" href="https://github.com/Blogshot/trip-sitter/releases/latest">Update</br>available</a>
+
     <div id="quest" class="status">
       <img class="status_content" src="./assets/quest.png">
     </div>
@@ -184,22 +198,21 @@
 
     <div style="text-shadow: 0 0 10px #6b2ca8;">
       <h2>Drop .ats or .synth here</h2>
-        <img id="dropLogo" src="./assets/icons8-double-down-96.png"></img></br>
-        <div id="spinner" style="display: none;" class="centered lds-ripple">
-          <div></div>
-          <div></div>
-        </div>
-        <p>The files will be converted into their counterparts.</p>
+      <img id="dropLogo" src="./assets/icons8-double-down-96.png"></img></br>
+      <div id="spinner" style="display: none;" class="centered lds-ripple">
+        <div></div>
+        <div></div>
       </div>
+      <p>The files will be converted into their counterparts.</p>
     </div>
   </div>
-  
+  </div>
+
 
   <div id="disclaimer" class="centered">
     <div>
-      Refer to <a href=https://github.com/Blogshot/trip-sitter/>GitHub</a> for any questions and How-Tos.
-    </br>
-      <p>Icons by <a href=https://icons8.com/>icons8.com</a></p>
+      <p>Refer to <a href="https://github.com/Blogshot/trip-sitter#disclaimer" target="_blank">GitHub</a> for any questions and How-Tos.</p>
+      <p>Icons by <a href="https://icons8.com" target="_blank">icons8</a></p>
     </div>
   </div>
 </body>

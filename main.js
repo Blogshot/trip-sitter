@@ -1,11 +1,12 @@
-const { app, BrowserWindow } = require('electron')
+const { app, shell,  BrowserWindow } = require('electron');
 
 require('log-timestamp');
 
 var win
+var debug = true
 
-function createWindow () {
-  
+function createWindow() {
+
   win = new BrowserWindow({
     width: 900,
     height: 550,
@@ -14,11 +15,23 @@ function createWindow () {
     }
   })
 
-  win.setMenu(null)
-  win.setResizable(false)
-  //win.webContents.openDevTools()
+  if (debug) {
+    win.setMenu(null)
+    win.webContents.openDevTools()
+    win.setSize(1200, 900)
+  }
+  win.setResizable(debug)
 
   win.loadFile('index.html')
+
+  var questStatus = null;
+  var questTmpStatus = false;
+
+  // Open links in the system's default Browser
+  win.webContents.on('new-window', (e, url) => {
+    e.preventDefault()
+    shell.openExternal(url)
+  })
 
   // Check if quest is connected every 2 seconds
   setInterval(function () {
@@ -28,28 +41,43 @@ function createWindow () {
     questWrapper.questIsConnected().then(data => {
       win.webContents.executeJavaScript(`document.getElementById('quest').style.backgroundColor = "green";`)
     }).catch(error => {
-      console.log("Quest is not connected")
+      questTmpStatus = false
       win.webContents.executeJavaScript(`document.getElementById('quest').style.backgroundColor = "red";`)
     })
 
+    // only print to console if status changes OR on first check
+    if (questStatus != questTmpStatus || questStatus == null) {
+      questStatus = questTmpStatus;
+
+      // if questStatus is not true, insert "not"
+      console.log("Quest is" + (questStatus ? "" : " not") + " connected")
+    }
+
   }, 2000)
 
-  // check if PC version is installed
-  var locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
+  setInterval(function () {
 
-  var fs = require('fs')
-  var pc = fs.existsSync(locationPC)
+    // check if PC version is installed
+    var locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
 
-  if (pc) {
-    win.webContents.executeJavaScript(`document.getElementById('pc').style.backgroundColor = "green";`)
-  } else {
-    win.webContents.executeJavaScript(`document.getElementById('pc').style.backgroundColor = "red";`)
-  }
+    var fs = require('fs')
+    var pc = fs.existsSync(locationPC)
+
+    if (pc) {
+      win.webContents.executeJavaScript(`document.getElementById('pc').style.backgroundColor = "green";`)
+    } else {
+      win.webContents.executeJavaScript(`document.getElementById('pc').style.backgroundColor = "red";`)
+    }
+
+  }, 2000)
+
+  // check for update on start
+  checkUpdate();
 }
 
 var ipc = require('electron').ipcMain;
 
-ipc.on('onFile', function(event, data){    
+ipc.on('onFile', function(event, data){
 
   setLoading(true)
 
@@ -74,7 +102,7 @@ app.whenReady().then(createWindow)
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    
+
     app.quit()
   }
 })
@@ -94,4 +122,65 @@ function setLoading(bool) {
     win.webContents.executeJavaScript(`document.getElementById("spinner").style.display = "none";`)
     win.webContents.executeJavaScript(`document.getElementById("dropLogo").style.removeProperty('display');`)
   }
+}
+
+function checkUpdate() {
+
+  var https = require('https')
+
+  const options = {
+    hostname: 'api.github.com',
+    path: '/repos/Blogshot/trip-sitter/releases/latest',
+    headers: { 'User-Agent': 'console' }
+  };
+
+  var data = "";
+
+  https.get(options, response => {
+
+    // response is glued together from chunks
+    response.on('data', function (body) {
+      data += body
+    });
+
+    // after response is complete
+    response.on('end', () => {
+
+      // check for status code (detection of rate limits, etc.)
+      if (response.statusCode != 200) {
+        console.log("Statuscode was: " + response.statusCode + " instead of 200. Response:\n" + JSON.stringify(JSON.parse(data), null, 2))
+        return
+      }
+
+      // get version numbers
+      var pjson = require('./package.json');
+      var local = pjson.version.split(".");
+      var remote = JSON.parse(data).tag_name.substr(1).split(".");
+      
+      // If debug is disabled and update available, show button
+      if (!debug && updateAvailable(local, remote)) {
+        win.webContents.executeJavaScript(`document.getElementById("update").style.visibility = "visible";`)
+      }
+    });
+
+  }).on('error', (e) => {
+    console.error(e);
+  });
+}
+
+function updateAvailable(local, remote) {
+  
+  if (local[0] < remote[0]) {
+    console.log("Major version available")
+    return true
+  } else if (local[1] < remote[1]) {
+    console.log("Minor version available")
+    return true
+  } else if (local[2] < remote[2]) {
+    console.log("Patch version available")
+    return true
+  }
+
+  console.log("Now new version available")
+  return false
 }

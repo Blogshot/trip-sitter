@@ -5,6 +5,9 @@ require('log-timestamp');
 var win
 var debug = true
 
+var pcCheck
+var questCheck
+
 function createWindow() {
 
   win = new BrowserWindow({
@@ -34,7 +37,7 @@ function createWindow() {
   })
 
   // Check if quest is connected every 2 seconds
-  setInterval(function () {
+  questCheck = setInterval(function () {
 
     var questWrapper = require('./utils/questWrapper')
 
@@ -55,7 +58,7 @@ function createWindow() {
 
   }, 2000)
 
-  setInterval(function () {
+  pcCheck = setInterval(function () {
 
     // check if PC version is installed
     var locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
@@ -102,6 +105,8 @@ app.whenReady().then(createWindow)
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    clearInterval(questCheck);
+    clearInterval(pcCheck);
 
     app.quit()
   }
@@ -169,7 +174,7 @@ function checkUpdate() {
 }
 
 function updateAvailable(local, remote) {
-  
+
   if (local[0] < remote[0]) {
     console.log("Major version available")
     return true

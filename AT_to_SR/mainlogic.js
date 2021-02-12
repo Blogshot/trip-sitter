@@ -55,7 +55,7 @@ module.exports = {
         "UpdatedWithMovementPositions": true,
         "ProductionMode": true,
         "Tags": [],
-        "BeatConverted": false,
+        "BeatConverted": true,
         "ModifiedTime": parseInt((Date.now() / 1000))
       }
     }

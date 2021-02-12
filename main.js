@@ -12,16 +12,17 @@ function createWindow() {
 
   win = new BrowserWindow({
     width: 900,
-    height: 550,
+    height: 580,
     webPreferences: {
       nodeIntegration: true
     }
   })
 
   if (debug) {
-    win.setMenu(null)
     win.webContents.openDevTools()
     win.setSize(1200, 900)
+  } else {
+    win.setMenu(null)
   }
   win.setResizable(debug)
 
@@ -60,16 +61,26 @@ function createWindow() {
 
   pcCheck = setInterval(function () {
 
-    // check if PC version is installed
-    var locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
+    // check if AT is installed
+    var locationPC_AT = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
+
+    // need logic to get SR custom song location
+    var locationPC_SR = "C:\\"
 
     var fs = require('fs')
-    var pc = fs.existsSync(locationPC)
+    var at = fs.existsSync(locationPC_AT)
+    var sr = fs.existsSync(locationPC_SR)
 
-    if (pc) {
-      win.webContents.executeJavaScript(`document.getElementById('pc').style.backgroundColor = "green";`)
+    if (at) {
+      win.webContents.executeJavaScript(`document.getElementById('at').style.backgroundColor = "green";`)
     } else {
-      win.webContents.executeJavaScript(`document.getElementById('pc').style.backgroundColor = "red";`)
+      win.webContents.executeJavaScript(`document.getElementById('at').style.backgroundColor = "red";`)
+    }
+
+    if (sr) {
+      win.webContents.executeJavaScript(`document.getElementById('sr').style.backgroundColor = "yellow";`)
+    } else {
+      win.webContents.executeJavaScript(`document.getElementById('sr').style.backgroundColor = "red";`)
     }
 
   }, 2000)

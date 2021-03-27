@@ -29,6 +29,7 @@ module.exports = {
     var json = JSON.parse(data.toString().trim())
     
     json.bpm = json.BPM
+    json.offSetMS = 0
     json.duration = duration
 
     // create track events

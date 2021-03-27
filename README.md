@@ -17,7 +17,7 @@ Download the latest [release](https://github.com/Blogshot/trip-sitter/releases) 
 
 ## Usage
 SynthRiders -> AudioTrip: Drag'n'Drop a `.synth`-file into the app to make it available in AudioTrip.
-AudioTrip -> SynthRiders: Drag'n'Drop a `.ats`-file into the app to make it available in SynthRiders. (not yet supported; in active development)
+AudioTrip -> SynthRiders: Drag'n'Drop a `.ats`-file into the app to make it available in SynthRiders. (not yet supported; not in active development)
 
 ## Limitations
 * Elements/Gems might be inaccurately timed or difficult to reach in-game

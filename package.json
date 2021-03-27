@@ -1,6 +1,6 @@
 {
   "name": "trip-sitter",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "",
   "main": "main.js",
   "dependencies": {
@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "electron": "^9.4.0",
-    "electron-builder": "^22.7.0"
+    "electron-builder": "^22.10.5"
   },
   "scripts": {
     "start": "electron .",

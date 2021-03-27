@@ -174,9 +174,13 @@
           array.push(f.path)
         }
 
-        ipc.once('actionReply', function (event, response) {
-          alert(response)
+        ipc.once('actionError', function (event, response) {
+          alert("Error:\n" + response)
         })
+
+        ipc.once('actionSuccess', function (event, response) {
+          alert("Success:\n" + response)
+        })        
 
         ipc.send('onFile', array)
 

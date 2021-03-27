@@ -80,7 +80,7 @@ module.exports = {
 
   },
 
-  deployToGame: async function deployToGame(path) {
+  deployToGame: async function deployToGame(path, gameDir) {
 
     var synth = fs.readdirSync(path).filter(function (file) { return file.match(".*\.synth") })[0]
 

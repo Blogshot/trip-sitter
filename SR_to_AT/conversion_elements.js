@@ -1,15 +1,17 @@
 module.exports = {
 
-  generateCrouch: function generateCrouch(currentElement) {
+  generateCrouch: function generateCrouch(currentElement, json) {
 
     // modify element to have an additional "custom" slideType
     currentElement.slideType = 5
 
     // business as usual
-    return this.generateBarrier(currentElement)
+    return this.generateBarrier(currentElement, json)
   },
 
-  generateBarrier: function generateBarrier(currentElement) {
+  generateBarrier: function generateBarrier(currentElement, json) {
+
+    var conversion_math = require('./conversion_math')
 
     var event = new Object()
 
@@ -61,14 +63,16 @@ module.exports = {
     event.beatDivision = 2
     event.broadcastEventID = 0
 
-    event.time = conversion.calcBeatFromMillis(conversion.calcMSFromZ(currentElement.position[2]), bpm, offSetMS)
+    event.time = conversion_math.calcBeatFromMillis(conversion_math.calcMSFromZ(currentElement.position[2]), json.bpm, json.offSetMS)
 
     event.gemType = "barrier"
 
     return event;
   },
 
-  generateEvent: function generateEvent(currentElement) {
+  generateEvent: function generateEvent(currentElement, json) {
+
+    var conversion_math = require('./conversion_math')
 
     var event = new Object()
 
@@ -98,12 +102,12 @@ module.exports = {
     event.beatDivision = 2
     event.broadcastEventID = 0
 
-    var convertedCoords = conversion.calcXY(currentElement.Position[0].toFixed(2), currentElement.Position[1].toFixed(2))
+    var convertedCoords = conversion_math.calcXY(currentElement.Position[0].toFixed(2), currentElement.Position[1].toFixed(2))
 
     event.position.x = convertedCoords.x
     event.position.y = convertedCoords.y
 
-    event.time = conversion.calcBeatFromMillis(conversion.calcMSFromZ(currentElement.Position[2]), bpm, offSetMS)
+    event.time = conversion_math.calcBeatFromMillis(conversion_math.calcMSFromZ(currentElement.Position[2]), json.bpm, json.offSetMS)
 
     event.position.z = 0
 
@@ -133,14 +137,14 @@ module.exports = {
     var max = Math.max.apply(Math, currentElement.Segments.map(function (o) { return o[2]; }))
     var length = max - start
 
-    var length_ms = conversion.calcMSFromZ(length)
+    var length_ms = conversion_math.calcMSFromZ(length)
 
     // for short ribbons (< 1 beat) we may need additional positions, so we increase beatdivision
-    if (conversion.calcBeatFromMillis(length_ms, bpm, offSetMS).beat == 0) {
+    if (conversion_math.calcBeatFromMillis(length_ms, json.bpm, json.offSetMS).beat == 0) {
       event.beatDivision = 4
     }
 
-    var length_beatDivision = (60000 / bpm).toFixed(0) / event.beatDivision
+    var length_beatDivision = (60000 / json.bpm).toFixed(0) / event.beatDivision
 
     var checkPoints = new Array()
 
@@ -157,7 +161,7 @@ module.exports = {
       var currentCheckpoint = checkPoints[checkpoint]
 
       // find the nearest checkpoint in SynthRiders' format
-      var goal = conversion.calcZFromMS(currentCheckpoint) + start
+      var goal = conversion_math.calcZFromMS(currentCheckpoint) + start
 
       var mindiff
       var prevmin = -1
@@ -180,7 +184,7 @@ module.exports = {
 
       var subPosition = new Object()
 
-      var XY = conversion.calcXY(closest[0], closest[1], true)
+      var XY = conversion_math.calcXY(closest[0], closest[1], true)
       subPosition.x = XY.x * 2 / 3
       subPosition.y = XY.y * 2 / 3
       subPosition.z = "unused"

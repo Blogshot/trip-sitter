@@ -1,14 +1,8 @@
 const fs = require('fs')
 
-const conversion_math = require('./conversion_math')
-const conversion_elements = require('./conversion_elements')
-
-var offSetMS
-var bpm
-
 module.exports = {
 
-  convertFile: function convertFile(filePath, tmpDir) {
+  convertFile: async function convertFile(filePath, tmpDir) {
 
     try {
       var extract = require('extract-zip')
@@ -33,14 +27,14 @@ module.exports = {
     var data = fs.readFileSync(tmpDir + "beatmap.meta.bin", { encoding: 'utf8' }).toString().trim()
 
     var json = JSON.parse(data.toString().trim())
-
-    bpm = json.BPM
-    offSetMS = json.Offset
+    
+    json.bpm = json.BPM
+    json.duration = duration
 
     // create track events
-    var metadata = createMetadata(json)
+    var metadata = this.createMetadata(json)
 
-    var choreographies = createChoreographies(json)
+    var choreographies = this.createChoreographies(json)
 
     // aggregate all data into final JSON
     return {
@@ -52,7 +46,7 @@ module.exports = {
     }
   },
 
-  createMetadata: function createMetadata() {
+  createMetadata: function createMetadata(json) {
 
     var metadata = new Object()
 
@@ -70,19 +64,22 @@ module.exports = {
     metadata.songEventTracks = new Array()
     metadata.includeInArcades = true
     metadata.firstBeatTimeInSeconds = 0
-    metadata.songEndTimeInSeconds = duration
+    metadata.songEndTimeInSeconds = json.duration
 
     metadata.tempoSections.push({
       startTimeInSeconds: 0.0,
       beatsPerMeasure: 4,
-      beatsPerMinute: bpm,
+      beatsPerMinute: json.bpm,
       doesStartNewMeasure: true
     })
 
     return metadata
   },
 
-  createChoreographies: function createChoreographies() {
+  createChoreographies: function createChoreographies(json) {
+    var conversion_elements = require('./conversion_elements')
+    var conversion_math = require('./conversion_math')
+
     var choreographies = new Object()
     choreographies.list = new Array()
 
@@ -124,7 +121,7 @@ module.exports = {
 
           var currentElement = currentTimestamp[element]
 
-          var event = conversion_elements.generateEvent(currentElement, trackElement)
+          var event = conversion_elements.generateEvent(currentElement, json)
 
           // if the element is using both hands, just split it (and it's segments) into two gems
           if (currentElement.Type == 3 || currentElement.Type == 2) {
@@ -148,7 +145,7 @@ module.exports = {
           currentCrouch = conversion_math.convertOldToNewFormat(currentCrouch, null)
         }
 
-        var event = conversion_elements.generateCrouch(currentCrouch)
+        var event = conversion_elements.generateCrouch(currentCrouch, json)
 
         event.newline = true
 
@@ -162,7 +159,7 @@ module.exports = {
           currentSlide = conversion_math.convertOldToNewFormat(currentSlide.time, currentSlide.slideType)
         }
 
-        var event = conversion_elements.generateBarrier(currentSlide)
+        var event = conversion_elements.generateBarrier(currentSlide, json)
 
         event.newline = true
 
@@ -195,17 +192,15 @@ module.exports = {
     return choreographies
   },
 
-  deployToGame: async function deployToGame(path) {
-
-    var locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
+  deployToGame: async function deployToGame(path, gameDir) {
 
     var audioFile = fs.readdirSync(path).filter(function (file) { return file.match(".*\.ogg") })[0]
     var atsFile = fs.readdirSync(path).filter(function (file) { return file.match(".*\.ats") })[0]
 
     // write audio file and generated song into custom song location
-    if (fs.existsSync(locationPC)) {
-      fs.copyFileSync(path + audioFile, locationPC + audioFile)
-      fs.copyFileSync(path + atsFile, locationPC + atsFile)
+    if (fs.existsSync(gameDir)) {
+      fs.copyFileSync(path + audioFile, gameDir + audioFile)
+      fs.copyFileSync(path + atsFile, gameDir + atsFile)
     } else {
       fs.copyFileSync(path + atsFile, process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\" + atsFile)
     }

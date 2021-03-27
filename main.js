@@ -101,9 +101,9 @@ ipc.on('onFile', function(event, data){
     // start processing for each path
     var converter = require('./entrypoint.js')
     converter.startProcessing(data[elem], function(error) {
-
-      // callback is only for error messages
-      event.sender.send('actionReply', error);
+      event.sender.send('actionError', error);
+    }, function(success) {
+      event.sender.send('actionSuccess', "The files have been converted and were saved in: " + success);
     })
   }
 

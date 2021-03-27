@@ -15,6 +15,9 @@ This tool aims to provide an easy to use way to import existing AudioTrip/SynthR
 ## Installation
 Download the latest [release](https://github.com/Blogshot/trip-sitter/releases) and install.
 
+## Build
+Build via `npm run-script build`. The artifact will be located at `trip-sitter\dist`.
+
 ## Usage
 SynthRiders -> AudioTrip: Drag'n'Drop a `.synth`-file into the app to make it available in AudioTrip.
 AudioTrip -> SynthRiders: Drag'n'Drop a `.ats`-file into the app to make it available in SynthRiders. (not yet supported; not in active development)

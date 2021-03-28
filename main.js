@@ -95,19 +95,38 @@ ipc.on('onFile', function(event, data){
 
   setLoading(true)
 
+  var counter = 0
+  var target = data.length
+
   // date is an array of paths to the dropped files
   for (var elem in data) {
 
     // start processing for each path
     var converter = require('./entrypoint.js')
     converter.startProcessing(data[elem], function(error) {
+      counter++
+
+      event.sender.send('actionProgress', 'actionProgress', counter + "/" + target)
+
       event.sender.send('actionError', error);
+
+      if (counter == target) {
+        event.sender.send('actionSuccess', "The files have been converted and were saved in: " + success)
+        setLoading(false)
+      }
     }, function(success) {
-      event.sender.send('actionSuccess', "The files have been converted and were saved in: " + success);
+      counter++
+
+      event.sender.send('actionProgress', counter + "/" + target)
+
+      if (counter == target) {
+        event.sender.send('actionSuccess', "The files have been converted and were saved in: " + success)
+        setLoading(false)
+      }
     })
   }
 
-  setLoading(false)
+  
 
 });
 

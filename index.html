@@ -180,8 +180,16 @@
 
         ipc.once('actionSuccess', function (event, response) {
           alert("Success:\n" + response)
+
+          var progress = document.getElementById('progress');
+          progress.innerHTML = ""
         })        
 
+        ipc.once('actionProgress', function (event, response) {
+          var progress = document.getElementById('progress');
+          progress.innerHTML = response
+        }) 
+        
         ipc.send('onFile', array)
 
         return false;
@@ -216,6 +224,7 @@
         <div></div>
       </div>
       <p>The files will be converted into their counterparts.</p>
+      <div id="progress" class="centered"></div>
     </div>
   </div>
   </div>

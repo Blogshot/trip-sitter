@@ -167,8 +167,10 @@ module.exports = {
 
         if (oldFormat) {
           currentSlide = conversion_math.convertOldToNewFormat(currentSlide.time, currentSlide.slideType)
+        } else {
+          currentSlide.position = [0.0, 0.0, conversion_math.calcZFromMS(ms)]
         }
-
+        
         var event = conversion_elements.generateBarrier(currentSlide, json)
 
         event.newline = true

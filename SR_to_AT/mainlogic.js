@@ -14,6 +14,10 @@ module.exports = {
     // extract audio metadata from tmpDir
     var audioFile = fs.readdirSync(tmpDir).filter(function (file) { return file.match(".*\.ogg") })[0]
 
+    if (audioFile == undefined) {
+      return { "error": true, "message": "The provided audioFile is not a valid '.ogg'. '.wav' or '.mp3' is not supported." }
+    }
+
     var mm = require('music-metadata');
 
     var metadataAudio = await mm.parseFile(tmpDir + audioFile)
@@ -58,6 +62,7 @@ module.exports = {
     metadata.songID = ""
     metadata.koreography = { "instanceID": 0 }
     metadata.sceneName = "Universal"
+    metadata.avgBPM = json.bpm,
     metadata.title = json.Name
     metadata.artist = json.Author
     metadata.songFilename = json.AudioName
@@ -140,7 +145,10 @@ module.exports = {
       var oldFormat = json.UsingBeatMeasure == undefined || !json.UsingBeatMeasure
 
       for (var crouchElement in Crouchs) {
-        var currentCrouch = Crouchs[crouchElement]
+        var currentCrouchTime = Crouchs[crouchElement]
+        var currentCrouch = {
+          "time": currentCrouchTime
+        }
 
         if (oldFormat) {
           currentCrouch = conversion_math.convertOldToNewFormat(currentCrouch, null)
@@ -212,7 +220,7 @@ module.exports = {
       questWrapper.copyToQuest(path + audioFile, "AT")
       questWrapper.copyToQuest(path + atsFile, "AT")
     })
-
+    
   },
 }
 

@@ -54,16 +54,17 @@ module.exports = {
         // only possible via generateCrouch()
         event.hand = "crouch"
         event.position.y = 0.4 // a bit higher than shoulder level
-        event.position.z = 0
+        event.position.z = 0   // no rotation = horizontal
         break;
     }
 
     event.hasGuide = false
-    event.bloggi = currentElement.position[2]
+    event.bloggi = currentElement.time
     event.beatDivision = 2
     event.broadcastEventID = 0
 
-    event.time = conversion_math.calcBeatFromMillis(conversion_math.calcMSFromZ(currentElement.position[2]), json.bpm, json.offSetMS)
+    var ms = conversion_math.calcMSFromZ(currentElement.time)
+    event.time = conversion_math.calcBeatFromMillis(ms, json.bpm, json.offSetMS)
 
     event.gemType = "barrier"
 

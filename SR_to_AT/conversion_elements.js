@@ -59,11 +59,11 @@ module.exports = {
     }
 
     event.hasGuide = false
-    event.bloggi = currentElement.time
+    event.bloggi = currentElement.position[2]
     event.beatDivision = 2
     event.broadcastEventID = 0
 
-    var ms = conversion_math.calcMSFromZ(currentElement.time)
+    var ms = conversion_math.calcMSFromZ(currentElement.position[2])
     event.time = conversion_math.calcBeatFromMillis(ms, json.bpm, json.offSetMS)
 
     event.gemType = "barrier"

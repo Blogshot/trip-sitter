@@ -3,7 +3,7 @@ const { app, shell,  BrowserWindow } = require('electron');
 require('log-timestamp');
 
 var win
-var debug = true
+var debug = false
 
 var pcCheck
 var questCheck

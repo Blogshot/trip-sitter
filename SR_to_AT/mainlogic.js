@@ -145,13 +145,14 @@ module.exports = {
       var oldFormat = json.UsingBeatMeasure == undefined || !json.UsingBeatMeasure
 
       for (var crouchElement in Crouchs) {
-        var currentCrouchTime = Crouchs[crouchElement]
+        var ms = Crouchs[crouchElement]
+
         var currentCrouch = {
-          "time": currentCrouchTime
+          "position": [0.0, 0.0, conversion_math.calcZFromMS(ms)]
         }
 
         if (oldFormat) {
-          currentCrouch = conversion_math.convertOldToNewFormat(currentCrouch, null)
+          currentCrouch = conversion_math.convertOldToNewFormat(ms, null)
         }
 
         var event = conversion_elements.generateCrouch(currentCrouch, json)

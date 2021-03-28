@@ -9,7 +9,7 @@ module.exports = {
     var suffix = fileName.substr(fileName.length - fileName.substr(fileName.lastIndexOf(".")).length)
 
     // tmpdir = \Programs\trip-sitter\tmp_songname-without-suffix\
-    var tmpDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp_" + fileName.substr(0, fileName.length - suffix.length) + "\\"
+    var tmpDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\tmp_" + fileName.substr(0, fileName.length - suffix.length).split(".").join("_") + "\\"
     var locationPC
     var converter;
 
@@ -25,17 +25,19 @@ module.exports = {
 
     converter.convertFile(filePath, tmpDir).then(result => {
       if (result.error) {
-        errorCallback(result.data)
+        errorCallback(result.message)
         return
       }
   
       if (suffix == ".synth") {
   
         // result is ats json
-        fs.writeFileSync(tmpDir + result.data.metadata.title + ".ats", JSON.stringify(result.data, null, 2))
+        fs.writeFileSync(tmpDir + result.data.metadata.songFilename.replace(".ogg", ".ats"), JSON.stringify(result.data, null, 2))
   
         // deploy ats and ogg
         converter.deployToGame(tmpDir, locationPC)
+
+        fs.rmdirSync(tmpDir, { recursive: true });
   
       } else if (suffix == ".ats") {
   

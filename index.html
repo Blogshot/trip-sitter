@@ -174,18 +174,18 @@
           array.push(f.path)
         }
 
-        ipc.once('actionError', function (event, response) {
+        ipc.on('actionError', function (event, response) {
           alert("Error:\n" + response)
         })
 
-        ipc.once('actionSuccess', function (event, response) {
+        ipc.on('actionSuccess', function (event, response) {
           alert("Success:\n" + response)
 
           var progress = document.getElementById('progress');
           progress.innerHTML = ""
         })        
 
-        ipc.once('actionProgress', function (event, response) {
+        ipc.on('actionProgress', function (event, response) {
           var progress = document.getElementById('progress');
           progress.innerHTML = response
         }) 

@@ -2,7 +2,7 @@ const fs = require('fs')
 
 module.exports = {
 
-  startProcessing: function startProcessing(filePath, errorCallback, successCallback) {
+  startProcessing: function startProcessing(filePath, callback) {
 
     // filename = songname.ats / songname.synth / songname.ogg
     var fileName = filePath.substr(filePath.lastIndexOf("\\") + 1)
@@ -20,12 +20,18 @@ module.exports = {
       converter = require('./AT_to_SR/mainlogic')
       locationPC = "unknown"
     } else {
-      errorCallback("The file type of '" + fileName + "' not valid.")
+      callback({
+        "error": true,
+        "message": "The file type of '" + fileName + "' not valid." 
+      })
     }
 
     converter.convertFile(filePath, tmpDir).then(result => {
       if (result.error) {
-        errorCallback(result.message)
+        callback({
+          "error": true,
+          "message": result.message 
+        })
         return
       }
   
@@ -51,12 +57,17 @@ module.exports = {
           converter.deployToGame(synthPath, locationPC)
   
         }).catch(error => {
-          errorCallback(error)
+          callback({
+            "error": true,
+            "message": error
+          })
         })
-  
       }
 
-      successCallback(locationPC)
+      callback({
+        "error": false,
+        "message": locationPC
+      })
     })
 
   }

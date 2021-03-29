@@ -91,44 +91,41 @@ function createWindow() {
 
 var ipc = require('electron').ipcMain;
 
+var looperArray
+var converter = require('./entrypoint.js')
+
 ipc.on('onFile', function(event, data){
+
+  looperArray = data
 
   setLoading(true)
 
-  var counter = 0
-  var target = data.length
-
-  // date is an array of paths to the dropped files
-  for (var elem in data) {
-
-    // start processing for each path
-    var converter = require('./entrypoint.js')
-    converter.startProcessing(data[elem], function(error) {
-      counter++
-
-      event.sender.send('actionProgress', 'actionProgress', counter + "/" + target)
-
-      event.sender.send('actionError', error);
-
-      if (counter == target) {
-        event.sender.send('actionSuccess', "The files have been converted and were saved in: " + success)
-        setLoading(false)
-      }
-    }, function(success) {
-      counter++
-
-      event.sender.send('actionProgress', counter + "/" + target)
-
-      if (counter == target) {
-        event.sender.send('actionSuccess', "The files have been converted and were saved in: " + success)
-        setLoading(false)
-      }
-    })
-  }
-
-  
-
+  // start with first item
+  looper(event, looperArray[0], 0, data.length) 
 });
+
+function looper(event, elem, counter, target) {
+
+  // start processing
+  converter.startProcessing(elem, function(result) {
+    counter++
+
+    event.sender.send('actionProgress', counter + "/" + target)
+
+    if (result.error) {
+      event.sender.send('actionError', "The files have been converted and were saved in: " + result.message)
+    }
+    
+    if (counter == target) {
+      setLoading(false)
+      event.sender.send('actionSuccess', "The files have been converted and were saved in: " + result.message)
+    } else {
+      // delete first item, then enter next loop with new first item
+      looperArray = looperArray.splice(1)
+      looper(event, looperArray[0], counter, target)
+    }
+  })
+}
 
 app.whenReady().then(createWindow)
 

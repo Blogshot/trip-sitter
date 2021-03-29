@@ -80,7 +80,7 @@ module.exports = {
 
   },
 
-  deployToGame: async function deployToGame(path, gameDir) {
+  deployToGame: async function deployToGame(path, gameDir, fallbackDir, mapper) {
 
     var synth = fs.readdirSync(path).filter(function (file) { return file.match(".*\.synth") })[0]
 
@@ -96,7 +96,7 @@ module.exports = {
       fs.copyFileSync(path + synth, process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\" + synth)
     }
     */
-    fs.copyFileSync(path + synth, process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\" + synth)
+    fs.copyFileSync(path + synth, fallbackDir + mapper + "_" + synth)
 
     /*
     var questWrapper = require('./questWrapper')

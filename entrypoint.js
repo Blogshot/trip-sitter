@@ -13,6 +13,8 @@ module.exports = {
     var locationPC
     var converter;
 
+    var fallbackDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\"
+
     if (suffix == ".synth") {
       converter = require('./SR_to_AT/mainlogic')
       locationPC = process.env.LOCALAPPDATA + "Low\\Kinemotik Studios\\Audio Trip\\Songs\\"
@@ -41,7 +43,8 @@ module.exports = {
         fs.writeFileSync(tmpDir + result.data.metadata.songFilename.replace(".ogg", ".ats"), JSON.stringify(result.data, null, 2))
   
         // deploy ats and ogg
-        converter.deployToGame(tmpDir, locationPC)
+        var mapper = result.data.metadata.authorID.displayName.replace("Mapped by ", "").replace(" (converted from SynthRiders)", "")
+        converter.deployToGame(tmpDir, locationPC, fallbackDir, mapper)
 
         fs.rmdirSync(tmpDir, { recursive: true });
   

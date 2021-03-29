@@ -204,17 +204,18 @@ module.exports = {
     return choreographies
   },
 
-  deployToGame: async function deployToGame(path, gameDir) {
+  deployToGame: async function deployToGame(path, gameDir, fallbackDir, mapper) {
 
     var audioFile = fs.readdirSync(path).filter(function (file) { return file.match(".*\.ogg") })[0]
     var atsFile = fs.readdirSync(path).filter(function (file) { return file.match(".*\.ats") })[0]
 
     // write audio file and generated song into custom song location
     if (fs.existsSync(gameDir)) {
-      fs.copyFileSync(path + audioFile, gameDir + audioFile)
-      fs.copyFileSync(path + atsFile, gameDir + atsFile)
+      fs.copyFileSync(path + audioFile, gameDir  + mapper + "_" + audioFile)
+      fs.copyFileSync(path + atsFile, gameDir + mapper + "_" + atsFile)
     } else {
-      fs.copyFileSync(path + atsFile, process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\" + atsFile)
+      fs.copyFileSync(path + audioFile, fallbackDir + mapper + "_" + audioFile)
+      fs.copyFileSync(path + atsFile, fallbackDir + mapper + "_" + atsFile)
     }
 
     var questWrapper = require('./questWrapper')

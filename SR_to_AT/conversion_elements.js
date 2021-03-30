@@ -38,7 +38,7 @@ module.exports = {
       case 2:
         event.hand = "right diag"
         event.position.y = 0.2
-        event.position.z = -45
+        event.position.z = -60
         break;
       case 3:
         event.hand = "center"
@@ -46,7 +46,7 @@ module.exports = {
         break;
       case 4:
         event.hand = "left diag"
-        event.position.z = 45
+        event.position.z = 60
         event.position.y = 0.2
         // barrier left diagonal                
         break

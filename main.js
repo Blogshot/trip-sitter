@@ -113,7 +113,7 @@ function looper(event, elem, counter, target) {
     event.sender.send('actionProgress', counter + "/" + target)
 
     if (result.error) {
-      event.sender.send('actionError', "The files have been converted and were saved in: " + result.message)
+      event.sender.send('actionError', result.message)
     }
     
     if (counter == target) {

@@ -59,6 +59,7 @@ module.exports = {
         // deploy synth
         converter.deployToGame(synthPath, locationPC)
         
+        fs.rmdirSync(tmpDir, { recursive: true });
         }).catch(error => {
           callback({
             "error": true,

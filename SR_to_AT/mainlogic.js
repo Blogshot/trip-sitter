@@ -56,6 +56,7 @@ module.exports = {
     var metadata = new Object()
 
     metadata.custom = true
+    metadata.authorID_SR = json.Beatmapper
     metadata.authorID = {
       displayName: "Mapped by " + json.Beatmapper + " (converted from SynthRiders)"
     }
@@ -65,7 +66,7 @@ module.exports = {
     metadata.avgBPM = json.bpm,
     metadata.title = json.Name
     metadata.artist = json.Author
-    metadata.songFilename = json.AudioName
+    metadata.songFilename = json.Beatmapper + "_" + json.AudioName
     metadata.tempoSections = new Array()
     metadata.songEventTracks = new Array()
     metadata.includeInArcades = true

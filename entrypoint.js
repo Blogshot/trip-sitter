@@ -39,15 +39,15 @@ module.exports = {
   
       if (suffix == ".synth") {
   
+        var mapper = result.data.metadata.authorID_SR
+
         // result is ats json
-        fs.writeFileSync(tmpDir + result.data.metadata.songFilename.replace(".ogg", ".ats"), JSON.stringify(result.data, null, 2))
+        fs.writeFileSync(tmpDir + result.data.metadata.songFilename.replace(mapper + "_", "").replace(".ogg", ".ats"), JSON.stringify(result.data, null, 2))
   
         // deploy ats and ogg
-        var mapper = result.data.metadata.authorID.displayName.replace("Mapped by ", "").replace(" (converted from SynthRiders)", "")
         converter.deployToGame(tmpDir, locationPC, fallbackDir, mapper)
+          fs.rmdirSync(tmpDir, { recursive: true });
 
-        fs.rmdirSync(tmpDir, { recursive: true });
-  
       } else if (suffix == ".ats") {
   
         // result is beatmap.meta.bin json
@@ -56,9 +56,9 @@ module.exports = {
         // pack files into .synth
         converter.pack(tmpDir, result.data.Name + ".synth").then(synthPath => {
           
-          // deploy synth
-          converter.deployToGame(synthPath, locationPC)
-  
+        // deploy synth
+        converter.deployToGame(synthPath, locationPC)
+        
         }).catch(error => {
           callback({
             "error": true,

@@ -216,15 +216,15 @@ module.exports = {
     } else {
       fs.copyFileSync(path + audioFile, fallbackDir + mapper + "_" + audioFile)
       fs.copyFileSync(path + atsFile, fallbackDir + mapper + "_" + atsFile)
-    }
+    }    
 
-    var questWrapper = require('./questWrapper')
+    var questWrapper = require('../utils/questWrapper')
 
     questWrapper.questIsConnected().then(data => {
-      questWrapper.copyToQuest(path + audioFile, "AT")
-      questWrapper.copyToQuest(path + atsFile, "AT")
+      questWrapper.copyToQuest(path, audioFile, "AT")
+      questWrapper.copyToQuest(path, atsFile, "AT")
     })
-    
+
   },
 }
 

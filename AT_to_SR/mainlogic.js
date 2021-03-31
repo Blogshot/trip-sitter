@@ -99,7 +99,7 @@ module.exports = {
     fs.copyFileSync(path + synth, fallbackDir + mapper + "_" + synth)
 
     /*
-    var questWrapper = require('./questWrapper')
+    var questWrapper = require('../questWrapper')
 
     questWrapper.questIsConnected().then(data => {
       questWrapper.copyToQuest(path + synth, "SR")

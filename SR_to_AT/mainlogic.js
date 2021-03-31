@@ -8,14 +8,14 @@ module.exports = {
       var extract = require('extract-zip')
       await extract(filePath, { dir: tmpDir })
     } catch (exception) {
-      return { "error": true, "message": "The provided file (" + filePath + ") is either not a valid .synth or corrupt. Error:\n\n" + exception.message }
+      return { "error": true, "message": filePath + " is either not a valid .synth or corrupt." }
     }
 
     // extract audio metadata from tmpDir
     var audioFile = fs.readdirSync(tmpDir).filter(function (file) { return file.match(".*\.ogg") })[0]
 
     if (audioFile == undefined) {
-      return { "error": true, "message": "The provided audioFile is not a valid '.ogg'. '.wav' or '.mp3' is not supported." }
+      return { "error": true, "message": filePath + " doesn't contain a valid '.ogg' audio file." }
     }
 
     var mm = require('music-metadata');
@@ -24,7 +24,7 @@ module.exports = {
     var duration = Math.floor(metadataAudio.format?.duration)
 
     if (duration == undefined) {
-      return { "error": true, "message": "The provided audio file (" + tmpDir + audioFile + ") seems to be corrupt." }
+      return { "error": true, "message": tmpDir + audioFile + " seems to be corrupt." }
     }
 
     // get JSON contents of dropped file

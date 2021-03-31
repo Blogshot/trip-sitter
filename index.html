@@ -174,16 +174,26 @@
           array.push(f.path)
         }
 
-        ipc.on('actionError', function (event, response) {
-          alert("Error:\n" + response)
+        ipc.on('resetErrors', function (event, response) {
+          var errors = document.getElementById('errors');
+          errors.innerHTML = ""
         })
 
-        ipc.on('actionSuccess', function (event, response) {
+        ipc.on('actionError', function (event, response) {
+          var errors = document.getElementById('errors');
+
+          var divider = (errors.innerHTML == "") ? "" : "\n"
+          
+          errors.innerHTML += divider + response
+          
+        })
+
+        ipc.once('actionSuccess', function (event, response) {
           alert("Success:\n" + response)
 
           var progress = document.getElementById('progress');
           progress.innerHTML = ""
-        })        
+        })
 
         ipc.on('actionProgress', function (event, response) {
           var progress = document.getElementById('progress');
@@ -225,6 +235,7 @@
       </div>
       <p>The files will be converted into their counterparts.</p>
       <div id="progress" class="centered"></div>
+      <textarea id="errors" class="centered" cols="75" rows="3" style="overflow-y:auto;background: inherit;border: none; resize: none;font-family: 'cuyabra', arial;" ></textarea>
     </div>
   </div>
   </div>

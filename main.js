@@ -100,7 +100,10 @@ ipc.on('onFile', function(event, data){
 
   setLoading(true)
 
-  // start with first item
+  event.sender.send('resetErrors')
+
+  // start with first 
+  event.sender.send('actionProgress', 0 + "/" + data.length)
   looper(event, looperArray[0], 0, data.length) 
 });
 

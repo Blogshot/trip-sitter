@@ -188,11 +188,8 @@
           
         })
 
-        ipc.once('actionSuccess', function (event, response) {
-          alert("Success:\n" + response)
-
-          var progress = document.getElementById('progress');
-          progress.innerHTML = ""
+        ipc.once('actionMessage', function (event, response) {
+          alert(response)
         })
 
         ipc.on('actionProgress', function (event, response) {

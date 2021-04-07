@@ -104,10 +104,10 @@ ipc.on('onFile', function(event, data){
 
   // start with first 
   event.sender.send('actionProgress', 0 + "/" + data.length)
-  looper(event, looperArray[0], 0, data.length) 
+  looper(event, looperArray[0], 0, 0, data.length) 
 });
 
-function looper(event, elem, counter, target) {
+function looper(event, elem, errCounter, counter, target) {
 
   // start processing
   converter.startProcessing(elem, function(result) {
@@ -116,16 +116,27 @@ function looper(event, elem, counter, target) {
     event.sender.send('actionProgress', counter + "/" + target)
 
     if (result.error) {
+      // append the error to textArea
       event.sender.send('actionError', result.message)
+      errCounter++
     }
     
     if (counter == target) {
       setLoading(false)
-      event.sender.send('actionSuccess', "The files have been converted and were saved in: " + result.message)
+
+      var message = "The files have been processed."
+
+      if (errCounter > 0) {
+        message += "\n\nHowever, " + errCounter + " files produced errors."
+      }
+
+      event.sender.send('actionMessage', message)
+      event.sender.send('actionProgress', "")
+      
     } else {
       // delete first item, then enter next loop with new first item
       looperArray = looperArray.splice(1)
-      looper(event, looperArray[0], counter, target)
+      looper(event, looperArray[0], errCounter, counter, target)
     }
   })
 }
@@ -216,6 +227,6 @@ function updateAvailable(local, remote) {
     return true
   }
 
-  console.log("Now new version available")
+  console.log("No new version available")
   return false
 }

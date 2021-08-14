@@ -92,11 +92,13 @@ module.exports = {
 
     if (fs.existsSync(locationPC)) {
       fs.copyFileSync(path + synth, locationPC + synth)
+      openInExplorer(locationPC)
     } else {
       fs.copyFileSync(path + synth, process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\" + synth)
     }
     */
     fs.copyFileSync(path + synth, fallbackDir + mapper + "_" + synth)
+    openInExplorer(fallbackDir)
 
     /*
     var questWrapper = require('../questWrapper')
@@ -105,6 +107,13 @@ module.exports = {
       questWrapper.copyToQuest(path + synth, "SR")
     })
     */
-  }
+  },
+
+  openInExplorer: function openInExplorer(dir) {
+    
+    const {shell} = require('electron')
+
+    shell.openPath(dir) // Open the given file in the desktop's default manner.
+  },
 }
 

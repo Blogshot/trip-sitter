@@ -214,9 +214,11 @@ module.exports = {
     if (fs.existsSync(gameDir)) {
       fs.copyFileSync(path + audioFile, gameDir  + mapper + "_" + audioFile)
       fs.copyFileSync(path + atsFile, gameDir + mapper + "_" + atsFile)
+      this.openInExplorer(gameDir)
     } else {
       fs.copyFileSync(path + audioFile, fallbackDir + mapper + "_" + audioFile)
       fs.copyFileSync(path + atsFile, fallbackDir + mapper + "_" + atsFile)
+      this.openInExplorer(fallbackDir)
     }    
 
     var questWrapper = require('../utils/questWrapper')
@@ -225,7 +227,13 @@ module.exports = {
       questWrapper.copyToQuest(path, audioFile, "AT")
       questWrapper.copyToQuest(path, atsFile, "AT")
     })
+  },
 
+  openInExplorer: function openInExplorer(dir) {
+    
+    const {shell} = require('electron')
+
+    shell.openPath(dir)
   },
 }
 

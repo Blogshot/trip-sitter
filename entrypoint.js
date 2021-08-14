@@ -14,6 +14,9 @@ module.exports = {
     var converter;
 
     var fallbackDir = process.env.LOCALAPPDATA + "\\Programs\\trip-sitter\\output\\"
+    if (!fs.existsSync(fallbackDir)) {
+      fs.mkdirSync(fallbackDir);
+    }
 
     if (suffix == ".synth") {
       converter = require('./SR_to_AT/mainlogic')
@@ -24,7 +27,7 @@ module.exports = {
     } else {
       callback({
         "error": true,
-        "message": "The file type of '" + fileName + "' not valid." 
+        "message": "The file type of '" + fileName + "' not valid."
       })
     }
 
@@ -32,34 +35,33 @@ module.exports = {
       if (result.error) {
         callback({
           "error": true,
-          "message": result.message 
+          "message": result.message
         })
         return
       }
-  
+
       if (suffix == ".synth") {
-  
+
         var mapper = result.data.metadata.authorID_SR
 
         // result is ats json
         fs.writeFileSync(tmpDir + result.data.metadata.songFilename.replace(mapper + "_", "").replace(".ogg", ".ats"), JSON.stringify(result.data, null, 2))
-  
+
         // deploy ats and ogg
         converter.deployToGame(tmpDir, locationPC, fallbackDir, mapper)
-          fs.rmdirSync(tmpDir, { recursive: true });
+        fs.rmdirSync(tmpDir, { recursive: true });
 
       } else if (suffix == ".ats") {
-  
+
         // result is beatmap.meta.bin json
         fs.writeFileSync(tmpDir + "beatmap.meta.bin", JSON.stringify(result.data, null, 2))
-  
+
         // pack files into .synth
         converter.pack(tmpDir, result.data.Name + ".synth").then(synthPath => {
-          
-        // deploy synth
-        converter.deployToGame(synthPath, locationPC)
-        
-        fs.rmdirSync(tmpDir, { recursive: true });
+
+          // deploy synth
+          converter.deployToGame(synthPath, locationPC)
+          fs.rmdirSync(tmpDir, { recursive: true });
         }).catch(error => {
           callback({
             "error": true,

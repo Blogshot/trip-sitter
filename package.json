@@ -7,7 +7,7 @@
     "arraylist": "^0.1.0",
     "extract-zip": "^2.0.0",
     "log-timestamp": "^0.3.0",
-    "music-metadata": "^11.12.3"
+    "music-metadata": "^11.16.0"
   },
   "devDependencies": {
     "electron": "^41.10.6",
